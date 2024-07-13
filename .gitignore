@@ -3,3 +3,4 @@ __pycache__/
 
 # Virtual environment
 venv/
+debug_venv_3.9/
