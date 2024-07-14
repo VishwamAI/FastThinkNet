@@ -67,7 +67,8 @@ class NeuralNetworkAgent:
                     break
             epsilon = max(epsilon_end, epsilon * epsilon_decay)
             print(
-                f"Episode: {episode + 1}, Total Reward: {total_reward}, Epsilon: {epsilon:.2f}"
+                (f"Episode: {episode + 1}, Total Reward: {total_reward}, "
+                 f"Epsilon: {epsilon:.2f}")
             )
 
     def evaluate(self, env, episodes):
