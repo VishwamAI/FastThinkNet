@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.11]
+        python-version: [3.9, "3.11.x"]
 
     steps:
     - uses: actions/checkout@v4
@@ -57,9 +57,17 @@ jobs:
     - name: Pre-install development dependencies logging
       run: echo "Starting installation of development dependencies"
 
-    - name: Install development dependencies
-      timeout-minutes: 20
-      run: pip install flake8 black mypy pytest pytest-cov build twine
+    - name: Install linting tools
+      timeout-minutes: 10
+      run: pip install flake8 black mypy
+
+    - name: Install testing tools
+      timeout-minutes: 10
+      run: pip install pytest pytest-cov
+
+    - name: Install build tools
+      timeout-minutes: 10
+      run: pip install build twine
 
     - name: Post-install development dependencies logging
       run: echo "Finished installation of development dependencies"
@@ -161,7 +169,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     container:
-      image: tensorflow/tensorflow:latest
+      image: tensorflow/tensorflow:latest-py3
 
     steps:
     - uses: actions/checkout@v4
@@ -191,9 +199,17 @@ jobs:
         pip install -r requirements.txt
         pip install -e .
 
-    - name: Install development dependencies
-      timeout-minutes: 20
-      run: pip install flake8 black mypy pytest pytest-cov build twine
+    - name: Install linting tools
+      timeout-minutes: 10
+      run: pip install flake8 black mypy
+
+    - name: Install testing tools
+      timeout-minutes: 10
+      run: pip install pytest pytest-cov
+
+    - name: Install build tools
+      timeout-minutes: 10
+      run: pip install build twine
 
     - name: Install ML frameworks
       timeout-minutes: 15
