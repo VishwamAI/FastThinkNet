@@ -38,9 +38,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt || (echo "pip install failed" && cat /home/runner/.pip/pip.log && exit 1)
         pip install -e .
+        pip install torch tensorflow
     - name: Test FastThinkNet import
       run: |
         python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+    - name: Check CUDA availability
+      run: |
+        python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
+        python -c "import tensorflow as tf; print('GPU available:', tf.test.is_built_with_cuda())"
     - name: Install pytest
       run: |
         python -m pip install --upgrade pip
