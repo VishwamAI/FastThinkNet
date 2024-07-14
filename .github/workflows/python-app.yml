@@ -51,6 +51,8 @@ jobs:
       run: |
         echo "Current working directory:"
         pwd
+        echo "Python executable path:"
+        which python
         echo "Contents of site-packages:"
         ls -R $(python -c "import site; print(site.getsitepackages()[0])")
         echo "Python path:"
