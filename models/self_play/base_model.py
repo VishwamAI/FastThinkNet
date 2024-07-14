@@ -60,10 +60,7 @@ class FastThinkNetSelfPlay(nn.Module):
         self.optimizer.step()
 
     def curriculum_learning(
-        self,
-        env,
-        num_episodes: int,
-        difficulty_increase_freq: int
+        self, env, num_episodes: int, difficulty_increase_freq: int
     ):
         for episode in range(num_episodes):
             if episode % difficulty_increase_freq == 0:
@@ -81,10 +78,7 @@ class FastThinkNetSelfPlay(nn.Module):
             self.load_state_dict(past_version)
 
     def integrate_with_components(
-        self,
-        deep_learning_model,
-        rl_model,
-        meta_learning_model
+        self, deep_learning_model, rl_model, meta_learning_model
     ):
         # Placeholder for integration logic
         pass
@@ -93,7 +87,9 @@ class FastThinkNetSelfPlay(nn.Module):
 # Example usage
 if __name__ == "__main__":
     input_size, hidden_size, output_size = 10, 64, 5
-    self_play_model = FastThinkNetSelfPlay(input_size, hidden_size, output_size)
+    self_play_model = FastThinkNetSelfPlay(
+        input_size, hidden_size, output_size
+    )
 
     # Assuming we have an environment 'env' defined
     # env = YourEnvironment()

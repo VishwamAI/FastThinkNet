@@ -42,7 +42,9 @@ class FastThinkNetDeepLearning(nn.Module):
             if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
                 tensor = module.weight.data.abs()
                 threshold = (
-                    tensor.view(-1).kthvalue(int(tensor.numel() * pruning_rate)).values
+                    tensor.view(-1)
+                    .kthvalue(int(tensor.numel() * pruning_rate))
+                    .values
                 )
                 mask = tensor.gt(threshold).float()
                 module.weight.data.mul_(mask)

@@ -6,7 +6,10 @@ from typing import List, Tuple
 
 class FastThinkNetMeta(nn.Module):
     def __init__(
-        self, base_model: nn.Module, inner_lr: float = 0.01, meta_lr: float = 0.001
+        self,
+        base_model: nn.Module,
+        inner_lr: float = 0.01,
+        meta_lr: float = 0.001,
     ):
         super(FastThinkNetMeta, self).__init__()
         self.base_model = base_model
@@ -17,13 +20,17 @@ class FastThinkNetMeta(nn.Module):
         return self.base_model(x)
 
     def inner_loop(
-        self, support_set: Tuple[torch.Tensor, torch.Tensor], num_inner_steps: int = 1
+        self,
+        support_set: Tuple[torch.Tensor, torch.Tensor],
+        num_inner_steps: int = 1,
     ) -> nn.Module:
         x_support, y_support = support_set
         task_model = self.clone()
 
         for _ in range(num_inner_steps):
-            task_loss = nn.functional.mse_loss(task_model(x_support), y_support)
+            task_loss = nn.functional.mse_loss(
+                task_model(x_support), y_support
+            )
             task_model.adapt(task_loss)
 
         return task_model
@@ -34,7 +41,9 @@ class FastThinkNetMeta(nn.Module):
             param.data = param.data - self.inner_lr * grad
 
     def outer_loop(
-        self, tasks: List[Tuple[torch.Tensor, torch.Tensor]], num_inner_steps: int = 1
+        self,
+        tasks: List[Tuple[torch.Tensor, torch.Tensor]],
+        num_inner_steps: int = 1,
     ):
         meta_loss = 0.0
 
@@ -42,7 +51,9 @@ class FastThinkNetMeta(nn.Module):
             x_support, y_support = task
             x_query, y_query = task
 
-            task_model = self.inner_loop((x_support, y_support), num_inner_steps)
+            task_model = self.inner_loop(
+                (x_support, y_support), num_inner_steps
+            )
             task_loss = nn.functional.mse_loss(task_model(x_query), y_query)
             meta_loss += task_loss
 
