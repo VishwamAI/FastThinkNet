@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.11, 3.12]
+        python-version: [3.9, 3.11]
 
     steps:
     - uses: actions/checkout@v4
@@ -55,6 +55,83 @@ jobs:
     - name: Install ML frameworks
       timeout-minutes: 15
       run: pip install torch tensorflow
+
+    - name: Lint with flake8
+      run: flake8 .
+
+    - name: Check formatting with black
+      run: black --check .
+
+    - name: Type check with mypy
+      run: mypy .
+
+    - name: Test FastThinkNet import
+      run: python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+
+    - name: Run tests with coverage
+      run: pytest -v -ra --cov=FastThinkNet --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+
+    - name: Build package
+      run: python -m build
+
+    - name: Check distribution
+      run: twine check dist/*
+
+    - name: Test package installation
+      run: |
+        python -m venv test_env
+        source test_env/bin/activate
+        pip install dist/*.whl
+        python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+        deactivate
+
+  build-docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: tensorflow/tensorflow:latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-3.12
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Print Python and pip versions
+      run: |
+        python --version
+        pip --version
+
+    - name: List directory contents
+      run: ls -la
+
+    - name: Install project dependencies
+      timeout-minutes: 15
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+
+    - name: Install development dependencies
+      timeout-minutes: 20
+      run: pip install flake8 black mypy pytest pytest-cov build twine
+
+    - name: Install ML frameworks
+      timeout-minutes: 15
+      run: pip install torch
 
     - name: Lint with flake8
       run: flake8 .
