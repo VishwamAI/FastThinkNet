@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+
 class FastThinkNetRL:
     def __init__(self, state_dim, action_dim, learning_rate=0.001):
         self.state_dim = state_dim
@@ -8,19 +9,23 @@ class FastThinkNetRL:
         self.learning_rate = learning_rate
 
         # Policy network
-        self.policy_network = self._build_network(state_dim, action_dim, 'policy')
+        self.policy_network = self._build_network(state_dim, action_dim, "policy")
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # Value network
-        self.value_network = self._build_network(state_dim, 1, 'value')
+        self.value_network = self._build_network(state_dim, 1, "value")
         self.value_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
     def _build_network(self, input_dim, output_dim, name):
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation='relu', input_shape=(input_dim,)),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(output_dim, activation='softmax' if name == 'policy' else None)
-        ])
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(
+                    output_dim, activation="softmax" if name == "policy" else None
+                ),
+            ]
+        )
         return model
 
     def choose_action(self, state):
@@ -46,11 +51,15 @@ class FastThinkNetRL:
     def update_policy(self, states, actions, advantages):
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
-            selected_action_probs = tf.reduce_sum(action_probs * tf.one_hot(actions, self.action_dim), axis=1)
+            selected_action_probs = tf.reduce_sum(
+                action_probs * tf.one_hot(actions, self.action_dim), axis=1
+            )
             loss = -tf.reduce_mean(tf.math.log(selected_action_probs) * advantages)
 
         grads = tape.gradient(loss, self.policy_network.trainable_variables)
-        self.policy_optimizer.apply_gradients(zip(grads, self.policy_network.trainable_variables))
+        self.policy_optimizer.apply_gradients(
+            zip(grads, self.policy_network.trainable_variables)
+        )
         return loss
 
     @tf.function
@@ -60,7 +69,9 @@ class FastThinkNetRL:
             loss = tf.keras.losses.mean_squared_error(returns, predicted_values)
 
         grads = tape.gradient(loss, self.value_network.trainable_variables)
-        self.value_optimizer.apply_gradients(zip(grads, self.value_network.trainable_variables))
+        self.value_optimizer.apply_gradients(
+            zip(grads, self.value_network.trainable_variables)
+        )
         return loss
 
     def train(self, env, num_episodes, gamma=0.99):
@@ -85,12 +96,15 @@ class FastThinkNetRL:
             value_loss = self.update_value_function(states, returns)
 
             if episode % 10 == 0:
-                print(f"Episode {episode}, Policy Loss: {policy_loss.numpy()}, Value Loss: {value_loss.numpy()}")
+                print(
+                    f"Episode {episode}, Policy Loss: {policy_loss.numpy()}, Value Loss: {value_loss.numpy()}"
+                )
 
     def integrate_with_dl_model(self, dl_model):
         # This method would be implemented to integrate with the deep learning component
         # For example, it could use the DL model's output as part of the state representation
         pass
+
 
 # Example usage:
 # env = gym.make('CartPole-v1')

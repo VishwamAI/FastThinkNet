@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+
 class NeuralNetworkAgent:
     def __init__(self, state_size, action_size, learning_rate=0.001):
         self.state_size = state_size
@@ -9,13 +10,19 @@ class NeuralNetworkAgent:
         self.model = self.create_model()
 
     def create_model(self):
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation='relu', input_shape=(self.state_size,)),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(self.action_size, activation='linear')
-        ])
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
-                      loss='mse')
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Dense(
+                    64, activation="relu", input_shape=(self.state_size,)
+                ),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(self.action_size, activation="linear"),
+            ]
+        )
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
+            loss="mse",
+        )
         return model
 
     def act(self, state, epsilon=0):
@@ -33,7 +40,15 @@ class NeuralNetworkAgent:
             target[0][action] = reward + 0.99 * q_future
         self.model.fit(state[np.newaxis, ...], target, epochs=1, verbose=0)
 
-    def train(self, env, episodes, max_steps, epsilon_start=1.0, epsilon_end=0.01, epsilon_decay=0.995):
+    def train(
+        self,
+        env,
+        episodes,
+        max_steps,
+        epsilon_start=1.0,
+        epsilon_end=0.01,
+        epsilon_decay=0.995,
+    ):
         epsilon = epsilon_start
         for episode in range(episodes):
             state = env.reset()
@@ -47,7 +62,9 @@ class NeuralNetworkAgent:
                 if done:
                     break
             epsilon = max(epsilon_end, epsilon * epsilon_decay)
-            print(f"Episode: {episode + 1}, Total Reward: {total_reward}, Epsilon: {epsilon:.2f}")
+            print(
+                f"Episode: {episode + 1}, Total Reward: {total_reward}, Epsilon: {epsilon:.2f}"
+            )
 
     def evaluate(self, env, episodes):
         total_rewards = []
@@ -73,6 +90,7 @@ class NeuralNetworkAgent:
 
     def get_model_parameters(self):
         return self.model.get_weights()
+
 
 # Helper function
 def preprocess_state(state):

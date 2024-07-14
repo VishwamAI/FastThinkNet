@@ -9,6 +9,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class AdvancedFastThinkNet(nn.Module):
     def __init__(self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4):
         super(AdvancedFastThinkNet, self).__init__()
@@ -25,8 +26,7 @@ class AdvancedFastThinkNet(nn.Module):
 
         # Attention mechanism
         self.attention = TransformerEncoder(
-            TransformerEncoderLayer(d_model=hidden_dim, nhead=8),
-            num_layers=num_layers
+            TransformerEncoderLayer(d_model=hidden_dim, nhead=8), num_layers=num_layers
         )
 
         # Fully connected layers
@@ -40,7 +40,9 @@ class AdvancedFastThinkNet(nn.Module):
         try:
             # Reshape input if necessary
             if x.dim() == 2:
-                x = x.view(-1, 1, int(self.input_dim**0.5), int(self.input_dim**0.5))
+                x = x.view(
+                    -1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5)
+                )
 
             # Convolutional layers
             x = F.relu(self.conv1(x))
@@ -78,6 +80,7 @@ class AdvancedFastThinkNet(nn.Module):
         difficulty = min(1.0, epoch / max_epochs)
         self.dropout.p = 0.5 * difficulty
         logger.info(f"Curriculum learning: Set dropout to {self.dropout.p}")
+
 
 # Instantiate the advanced model
 advanced_model = AdvancedFastThinkNet()

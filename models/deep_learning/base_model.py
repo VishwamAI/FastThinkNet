@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class FastThinkNetDeepLearning(nn.Module):
     def __init__(self, input_channels=3, num_classes=10):
         super(FastThinkNetDeepLearning, self).__init__()
@@ -40,9 +41,12 @@ class FastThinkNetDeepLearning(nn.Module):
         for name, module in self.named_modules():
             if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
                 tensor = module.weight.data.abs()
-                threshold = tensor.view(-1).kthvalue(int(tensor.numel() * pruning_rate)).values
+                threshold = (
+                    tensor.view(-1).kthvalue(int(tensor.numel() * pruning_rate)).values
+                )
                 mask = tensor.gt(threshold).float()
                 module.weight.data.mul_(mask)
+
 
 # Example usage:
 # model = FastThinkNetDeepLearning(input_channels=3, num_classes=10)

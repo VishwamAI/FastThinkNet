@@ -11,9 +11,14 @@ def create_data_pipeline():
     train_dataset = tf.data.Dataset.from_tensor_slices((train_images, train_labels))
 
     # Shuffle, batch, and prefetch the dataset
-    train_dataset = train_dataset.shuffle(buffer_size=1024).batch(32).prefetch(tf.data.experimental.AUTOTUNE)
+    train_dataset = (
+        train_dataset.shuffle(buffer_size=1024)
+        .batch(32)
+        .prefetch(tf.data.experimental.AUTOTUNE)
+    )
 
     return train_dataset
+
 
 # Create the dataset
 train_dataset = create_data_pipeline()

@@ -4,6 +4,7 @@ import torch.optim as optim
 import random
 from typing import List, Tuple
 
+
 class FastThinkNetSelfPlay(nn.Module):
     def __init__(self, input_size: int, hidden_size: int, output_size: int):
         super(FastThinkNetSelfPlay, self).__init__()
@@ -12,7 +13,7 @@ class FastThinkNetSelfPlay(nn.Module):
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
-            nn.Linear(hidden_size, output_size)
+            nn.Linear(hidden_size, output_size),
         )
         self.optimizer = optim.Adam(self.parameters())
         self.past_versions: List[nn.Module] = []
@@ -20,7 +21,9 @@ class FastThinkNetSelfPlay(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
 
-    def generate_self_play_episode(self, env) -> Tuple[List[torch.Tensor], List[torch.Tensor], List[float]]:
+    def generate_self_play_episode(
+        self, env
+    ) -> Tuple[List[torch.Tensor], List[torch.Tensor], List[float]]:
         states, actions, rewards = [], [], []
         state = env.reset()
         done = False
@@ -40,7 +43,12 @@ class FastThinkNetSelfPlay(nn.Module):
 
         return states, actions, rewards
 
-    def update_model(self, states: List[torch.Tensor], actions: List[torch.Tensor], rewards: List[float]):
+    def update_model(
+        self,
+        states: List[torch.Tensor],
+        actions: List[torch.Tensor],
+        rewards: List[float],
+    ):
         self.optimizer.zero_grad()
         loss = 0
 
@@ -51,7 +59,9 @@ class FastThinkNetSelfPlay(nn.Module):
         loss.backward()
         self.optimizer.step()
 
-    def curriculum_learning(self, env, num_episodes: int, difficulty_increase_freq: int):
+    def curriculum_learning(
+        self, env, num_episodes: int, difficulty_increase_freq: int
+    ):
         for episode in range(num_episodes):
             if episode % difficulty_increase_freq == 0:
                 env.increase_difficulty()
@@ -67,9 +77,12 @@ class FastThinkNetSelfPlay(nn.Module):
             past_version = random.choice(self.past_versions)
             self.load_state_dict(past_version)
 
-    def integrate_with_components(self, deep_learning_model, rl_model, meta_learning_model):
+    def integrate_with_components(
+        self, deep_learning_model, rl_model, meta_learning_model
+    ):
         # Placeholder for integration logic
         pass
+
 
 # Example usage
 if __name__ == "__main__":
