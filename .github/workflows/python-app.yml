@@ -103,6 +103,11 @@ jobs:
     - name: Pre-lint logging
       run: echo "Starting linting with flake8"
 
+    - name: Ensure flake8 is installed
+      run: |
+        pip install flake8
+        flake8 --version
+
     - name: Lint with flake8
       run: flake8 .
 
