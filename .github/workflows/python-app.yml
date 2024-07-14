@@ -44,6 +44,12 @@ jobs:
         pip install -r requirements.txt || (echo "pip install failed" && cat /home/runner/.pip/pip.log && exit 1)
         pip install -e .
         pip install torch tensorflow
+    - name: Debug package installation
+      run: |
+        echo "Contents of site-packages:"
+        ls -R $(python -c "import site; print(site.getsitepackages()[0])")
+        echo "FastThinkNet package location:"
+        python -c "import FastThinkNet; print(FastThinkNet.__file__)" || echo "FastThinkNet import failed"
     - name: List installed packages
       run: |
         pip list
