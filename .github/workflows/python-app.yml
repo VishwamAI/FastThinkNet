@@ -109,7 +109,7 @@ jobs:
         flake8 --version
 
     - name: Lint with flake8
-      run: flake8 .
+      run: python -m flake8 .
 
     - name: Post-lint logging
       run: echo "Finished linting with flake8"
