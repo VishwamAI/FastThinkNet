@@ -41,6 +41,9 @@ jobs:
     - name: List directory contents
       run: ls -la
 
+    - name: Pre-install project dependencies logging
+      run: echo "Starting installation of project dependencies"
+
     - name: Install project dependencies
       timeout-minutes: 15
       run: |
@@ -48,28 +51,73 @@ jobs:
         pip install -r requirements.txt
         pip install -e .
 
+    - name: Post-install project dependencies logging
+      run: echo "Finished installation of project dependencies"
+
+    - name: Pre-install development dependencies logging
+      run: echo "Starting installation of development dependencies"
+
     - name: Install development dependencies
       timeout-minutes: 20
       run: pip install flake8 black mypy pytest pytest-cov build twine
+
+    - name: Post-install development dependencies logging
+      run: echo "Finished installation of development dependencies"
+
+    - name: Pre-install ML frameworks logging
+      run: echo "Starting installation of ML frameworks"
 
     - name: Install ML frameworks
       timeout-minutes: 15
       run: pip install torch tensorflow
 
+    - name: Post-install ML frameworks logging
+      run: echo "Finished installation of ML frameworks"
+
+    - name: Pre-lint logging
+      run: echo "Starting linting with flake8"
+
     - name: Lint with flake8
       run: flake8 .
+
+    - name: Post-lint logging
+      run: echo "Finished linting with flake8"
+
+    - name: Pre-check formatting logging
+      run: echo "Starting formatting check with black"
 
     - name: Check formatting with black
       run: black --check .
 
+    - name: Post-check formatting logging
+      run: echo "Finished formatting check with black"
+
+    - name: Pre-type check logging
+      run: echo "Starting type check with mypy"
+
     - name: Type check with mypy
       run: mypy .
+
+    - name: Post-type check logging
+      run: echo "Finished type check with mypy"
+
+    - name: Pre-Test FastThinkNet import logging
+      run: echo "Starting FastThinkNet import test"
 
     - name: Test FastThinkNet import
       run: python -c "import FastThinkNet; print(FastThinkNet.__version__)"
 
+    - name: Post-Test FastThinkNet import logging
+      run: echo "Finished FastThinkNet import test"
+
+    - name: Pre-run tests logging
+      run: echo "Starting test execution with coverage"
+
     - name: Run tests with coverage
       run: pytest -v -ra --cov=FastThinkNet --cov-report=xml
+
+    - name: Post-run tests logging
+      run: echo "Finished test execution with coverage"
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -77,11 +125,26 @@ jobs:
         file: ./coverage.xml
         flags: unittests
 
+    - name: Pre-build logging
+      run: echo "Starting package build"
+
     - name: Build package
       run: python -m build
 
+    - name: Post-build logging
+      run: echo "Finished package build"
+
+    - name: Pre-check distribution logging
+      run: echo "Starting distribution check"
+
     - name: Check distribution
       run: twine check dist/*
+
+    - name: Post-check distribution logging
+      run: echo "Finished distribution check"
+
+    - name: Pre-test package installation logging
+      run: echo "Starting test package installation"
 
     - name: Test package installation
       run: |
@@ -90,6 +153,9 @@ jobs:
         pip install dist/*.whl
         python -c "import FastThinkNet; print(FastThinkNet.__version__)"
         deactivate
+
+    - name: Post-test package installation logging
+      run: echo "Finished test package installation"
 
   build-docker:
     runs-on: ubuntu-latest
