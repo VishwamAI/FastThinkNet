@@ -25,6 +25,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Print Python and pip versions
       run: |
         python --version
@@ -33,28 +41,45 @@ jobs:
     - name: List directory contents
       run: ls -la
 
-    - name: Clear cache
-      run: |
-        pip cache purge
-        rm -rf ~/.cache/pip
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
         pip install torch tensorflow
+        pip install flake8 black mypy pytest pytest-cov build twine
+
+    - name: Lint with flake8
+      run: flake8 .
+
+    - name: Check formatting with black
+      run: black --check .
+
+    - name: Type check with mypy
+      run: mypy .
 
     - name: Test FastThinkNet import
       run: python -c "import FastThinkNet; print(FastThinkNet.__version__)"
 
-    - name: Check CUDA availability
+    - name: Run tests with coverage
+      run: pytest -v -ra --cov=FastThinkNet --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+
+    - name: Build package
+      run: python -m build
+
+    - name: Check distribution
+      run: twine check dist/*
+
+    - name: Test package installation
       run: |
-        python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
-        python -c "import tensorflow as tf; print('GPU available:', tf.test.is_built_with_cuda())"
-
-    - name: Install pytest
-      run: pip install pytest
-
-    - name: Test with pytest
-      run: pytest -v -ra
+        python -m venv test_env
+        source test_env/bin/activate
+        pip install dist/*.whl
+        python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+        deactivate
