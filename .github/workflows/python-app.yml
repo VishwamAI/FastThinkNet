@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
 
     strategy:
       matrix:
@@ -45,7 +45,7 @@ jobs:
       run: echo "Starting installation of project dependencies"
 
     - name: Install project dependencies
-      timeout-minutes: 45
+      timeout-minutes: 60
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
@@ -75,9 +75,18 @@ jobs:
     - name: Pre-install ML frameworks logging
       run: echo "Starting installation of ML frameworks"
 
-    - name: Install ML frameworks
+    - name: Install TensorFlow
       timeout-minutes: 15
-      run: pip install torch tensorflow
+      run: pip install tensorflow
+
+    - name: Install PyTorch
+      timeout-minutes: 15
+      run: pip install torch torchvision
+
+    - name: Install NVIDIA CUDA libraries
+      timeout-minutes: 20
+      run: |
+        pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 nvidia-cusolver-cu12 nvidia-cusparse-cu12
 
     - name: Post-install ML frameworks logging
       run: echo "Finished installation of ML frameworks"
@@ -167,7 +176,7 @@ jobs:
 
   build-docker:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     container:
       image: tensorflow/tensorflow:latest-py3
 
@@ -193,7 +202,7 @@ jobs:
       run: ls -la
 
     - name: Install project dependencies
-      timeout-minutes: 45
+      timeout-minutes: 60
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
@@ -211,9 +220,14 @@ jobs:
       timeout-minutes: 10
       run: pip install build twine
 
-    - name: Install ML frameworks
+    - name: Install PyTorch
       timeout-minutes: 15
-      run: pip install torch
+      run: pip install torch torchvision
+
+    - name: Install NVIDIA CUDA libraries
+      timeout-minutes: 20
+      run: |
+        pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 nvidia-cusolver-cu12 nvidia-cusparse-cu12
 
     - name: Lint with flake8
       run: flake8 .
