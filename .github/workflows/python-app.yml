@@ -8,8 +8,8 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     strategy:
       matrix:
@@ -29,7 +29,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python-version }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
@@ -46,8 +46,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
-        pip install torch tensorflow
         pip install flake8 black mypy pytest pytest-cov build twine
+
+    - name: Install ML frameworks
+      timeout-minutes: 10
+      run: pip install torch tensorflow
 
     - name: Lint with flake8
       run: flake8 .
