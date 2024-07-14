@@ -10,7 +10,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/VishwamAI/FastThinkNet',
     packages=find_packages(),
-    install_requires=open('requirements.txt').read().splitlines(),
+    install_requires=open('pip install -e .').read().splitlines(),
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
