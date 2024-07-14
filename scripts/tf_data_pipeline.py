@@ -2,6 +2,8 @@
 import tensorflow as tf
 
 # Define the data pipeline
+
+
 def create_data_pipeline():
     # Assuming we are working with MNIST dataset for the example
     (train_images, train_labels), _ = tf.keras.datasets.mnist.load_data()

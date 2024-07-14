@@ -5,7 +5,8 @@ setup(
     version="0.1.0",
     author="VishwamAI",
     author_email="kasinadhsarma@gmail.com",
-    description="A neural network library for fast thinking agents, integrating PyTorch and TensorFlow.",
+    description="A neural network library for fast thinking agents, integrating "
+    "PyTorch and TensorFlow.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/VishwamAI/FastThinkNet",

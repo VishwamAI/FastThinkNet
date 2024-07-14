@@ -38,7 +38,7 @@ class FastThinkNetDeepLearning(nn.Module):
         This is a simple magnitude-based pruning method.
         """
         for name, module in self.named_modules():
-            if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
+            if isinstance(module, (nn.Conv2d, nn.Linear)):
                 tensor = module.weight.data.abs()
                 threshold = tensor.view(-1).kthvalue(
                     int(tensor.numel() * pruning_rate)
