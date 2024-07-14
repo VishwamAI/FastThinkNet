@@ -32,8 +32,11 @@ jobs:
       run: |
         python --version
         pip --version
-    - name: List directory contents
-      run: ls -la
+    - name: List directory contents and print requirements.txt
+      run: |
+        ls -la
+        echo "Contents of requirements.txt:"
+        cat requirements.txt
     - name: Clear cache
       run: |
         pip cache purge
@@ -42,19 +45,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt || (echo "pip install failed" && cat /home/runner/.pip/pip.log && exit 1)
-        pip install -e .
-        pip install torch tensorflow
-    - name: Debug package installation
-      run: |
-        echo "Contents of site-packages:"
-        ls -R $(python -c "import site; print(site.getsitepackages()[0])")
-        echo "FastThinkNet package location:"
-        python -c "import FastThinkNet; print(FastThinkNet.__file__)" || echo "FastThinkNet import failed"
-    - name: List installed packages
-      run: |
-        pip list
-        pip show FastThinkNet
-    - name: Debug environment
+        pip install -e . || (echo "FastThinkNet installation failed" && exit 1)
+        pip install torch tensorflow || (echo "PyTorch/TensorFlow installation failed" && exit 1)
+    - name: Debug environment and package installation
       run: |
         echo "Current working directory:"
         pwd
@@ -62,12 +55,12 @@ jobs:
         ls -R $(python -c "import site; print(site.getsitepackages()[0])")
         echo "Python path:"
         python -c "import sys; print('\n'.join(sys.path))"
-    - name: Test FastThinkNet import
-      run: |
+        echo "Installed packages:"
+        pip list
+        echo "FastThinkNet package info:"
+        pip show FastThinkNet
+        echo "FastThinkNet package location:"
         python -c "import FastThinkNet; print(FastThinkNet.__file__)" || echo "FastThinkNet import failed"
-    - name: Print Python path
-      run: |
-        python -c "import sys; print('\n'.join(sys.path))"
     - name: Check CUDA availability
       run: |
         python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
