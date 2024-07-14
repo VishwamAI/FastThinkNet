@@ -1,13 +1,12 @@
 import os
 import sys
-
 import pytest
 import torch
+from models.pytorch_model import FastThinkNet
+from scripts.tf_data_pipeline import create_data_pipeline
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from models.pytorch_model import FastThinkNet
-from scripts.tf_data_pipeline import create_data_pipeline
 
 @pytest.fixture
 def model():
