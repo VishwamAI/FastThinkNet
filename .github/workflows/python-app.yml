@@ -1,5 +1,8 @@
 name: Python application
 
+# Add a comment to trigger GitHub Actions workflow
+# This change is intended to verify workflow triggers
+
 on:
   push:
     branches: [ "*" ]
