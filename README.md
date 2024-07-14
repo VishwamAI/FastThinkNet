@@ -51,4 +51,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 https://github.com/VishwamAI/FastThinkNet
 
-*Last updated: 2023-06-08*# Trigger workflow
+*Last updated: 2023-06-08*
+
+*Note: This line was added to trigger the GitHub Actions workflow.*
