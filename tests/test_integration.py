@@ -19,6 +19,7 @@ def data_pipeline():
 def test_model_initialization(model):
     assert isinstance(model, FastThinkNet)
     assert model.fc1.in_features == 784
+    assert model.fc1.out_features == 128
     assert model.fc2.out_features == 64
     assert model.fc3.out_features == 10
 

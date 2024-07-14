@@ -50,3 +50,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## GitHub Repository
 
 https://github.com/VishwamAI/FastThinkNet
+
+*Last updated: 2023-06-08*
