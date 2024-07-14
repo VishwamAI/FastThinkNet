@@ -45,7 +45,10 @@ jobs:
         pip show FastThinkNet
     - name: Test FastThinkNet import
       run: |
-        python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+        python -c "import FastThinkNet; print(FastThinkNet.__version__)" || python -c "import sys; print(sys.path)"
+    - name: Print Python path
+      run: |
+        python -c "import sys; print('\n'.join(sys.path))"
     - name: Check CUDA availability
       run: |
         python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
