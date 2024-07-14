@@ -108,12 +108,15 @@ class FastThinkNetRL:
 
             if episode % 10 == 0:
                 print(
-                    f"Episode {episode}, Policy Loss: {policy_loss.numpy()}, Value Loss: {value_loss.numpy()}"
+                    f"Episode {episode}, "
+                    f"Policy Loss: {policy_loss.numpy()}, "
+                    f"Value Loss: {value_loss.numpy()}"
                 )
 
     def integrate_with_dl_model(self, dl_model):
-        # This method would be implemented to integrate with the deep learning component
-        # For example, it could use the DL model's output as part of the state representation
+        # This method would be implemented to integrate with the deep learning
+        # component. For example, it could use the DL model's output as part
+        # of the state representation
         pass
 
 
