@@ -47,10 +47,17 @@ jobs:
       run: |
         pip list
         pip show FastThinkNet
+    - name: Debug environment
+      run: |
+        echo "Current working directory:"
+        pwd
+        echo "Contents of site-packages:"
+        ls -R $(python -c "import site; print(site.getsitepackages()[0])")
+        echo "Python path:"
+        python -c "import sys; print('\n'.join(sys.path))"
     - name: Test FastThinkNet import
       run: |
-        python -c "import sys; print('Python path:', sys.path)"
-        python -c "import FastThinkNet; print('FastThinkNet path:', FastThinkNet.__file__)" || echo "FastThinkNet import failed"
+        python -c "import FastThinkNet; print(FastThinkNet.__file__)" || echo "FastThinkNet import failed"
     - name: Print Python path
       run: |
         python -c "import sys; print('\n'.join(sys.path))"
