@@ -19,7 +19,6 @@ class FastThinkNetMeta(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.base_model(x)
 
-
     def inner_loop(
         self,
         support_set: Tuple[torch.Tensor, torch.Tensor],
@@ -36,12 +35,10 @@ class FastThinkNetMeta(nn.Module):
 
         return task_model
 
-
     def adapt(self, loss: torch.Tensor):
         grads = torch.autograd.grad(loss, self.parameters(), create_graph=True)
         for param, grad in zip(self.parameters(), grads):
             param.data = param.data - self.inner_lr * grad
-
 
     def outer_loop(
         self,
@@ -64,7 +61,6 @@ class FastThinkNetMeta(nn.Module):
         meta_loss.backward()
         self.meta_optimizer.step()
 
-
     def few_shot_learning(
         self,
         support_set: Tuple[torch.Tensor, torch.Tensor],
@@ -74,12 +70,10 @@ class FastThinkNetMeta(nn.Module):
         adapted_model = self.inner_loop(support_set, num_inner_steps)
         return adapted_model(query_set)
 
-
     def clone(self) -> nn.Module:
         clone = type(self)(self.base_model, self.inner_lr)
         clone.load_state_dict(self.state_dict())
         return clone
-
 
     def integrate_with_dl_rl(
         self, dl_model: nn.Module, rl_model: nn.Module
