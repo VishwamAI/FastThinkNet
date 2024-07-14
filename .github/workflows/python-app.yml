@@ -19,37 +19,42 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Print Python and pip versions
       run: |
         python --version
         pip --version
+
     - name: List directory contents
       run: ls -la
+
     - name: Clear cache
       run: |
         pip cache purge
         rm -rf ~/.cache/pip
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt || (echo "pip install failed" && cat /home/runner/.pip/pip.log && exit 1)
+        pip install -r requirements.txt
         pip install -e .
         pip install torch tensorflow
+
     - name: Test FastThinkNet import
-      run: |
-        python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+      run: python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+
     - name: Check CUDA availability
       run: |
         python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
         python -c "import tensorflow as tf; print('GPU available:', tf.test.is_built_with_cuda())"
+
     - name: Install pytest
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
+      run: pip install pytest
+
     - name: Test with pytest
-      run: |
-        pytest -v -ra
+      run: pytest -v -ra
