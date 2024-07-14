@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     container:
-      image: tensorflow/tensorflow:latest-py3
+      image: tensorflow/tensorflow:latest-gpu-jupyter
 
     steps:
     - uses: actions/checkout@v4
