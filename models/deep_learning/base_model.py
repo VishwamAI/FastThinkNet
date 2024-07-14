@@ -39,9 +39,7 @@ class FastThinkNetDeepLearning(nn.Module):
         """
         for name, module in self.named_modules():
             if isinstance(module, (nn.Conv2d, nn.Linear)):
-                tensor = (
-                    module.weight.data.abs()
-                )
+                tensor = module.weight.data.abs()
                 threshold = (
                     tensor.view(-1)
                     .kthvalue(int(tensor.numel() * pruning_rate))
