@@ -101,8 +101,11 @@ if __name__ == "__main__":
     # self_play_model.update_model(states, actions, rewards)
 
     # Curriculum learning
-    # self_play_model.curriculum_learning(env, num_episodes=1000,
-    #                                    difficulty_increase_freq=100)
+    # self_play_model.curriculum_learning(
+    #     env,
+    #     num_episodes=1000,
+    #     difficulty_increase_freq=100
+    # )
 
     # Store and load past versions
     # self_play_model.store_current_version()
@@ -112,5 +115,8 @@ if __name__ == "__main__":
     # deep_learning_model = YourDeepLearningModel()
     # rl_model = YourReinforcementLearningModel()
     # meta_learning_model = YourMetaLearningModel()
-    # self_play_model.integrate_with_components(deep_learning_model, rl_model,
-    #                                          meta_learning_model)
+    # self_play_model.integrate_with_components(
+    #     deep_learning_model,
+    #     rl_model,
+    #     meta_learning_model
+    # )
