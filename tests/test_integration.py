@@ -1,13 +1,12 @@
-# Import necessary modules
 import sys
 import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 import tensorflow as tf
 import pytest
 from models.pytorch_model import FastThinkNet
 from scripts.tf_data_pipeline import create_data_pipeline
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 @pytest.fixture
