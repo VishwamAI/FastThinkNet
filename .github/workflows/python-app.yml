@@ -11,6 +11,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+
     strategy:
       matrix:
         python-version: [3.9, 3.11, 3.12]
@@ -45,7 +49,8 @@ jobs:
         pip show FastThinkNet
     - name: Test FastThinkNet import
       run: |
-        python -c "import FastThinkNet; print(FastThinkNet.__version__)" || python -c "import sys; print(sys.path)"
+        python -c "import sys; print('Python path:', sys.path)"
+        python -c "import FastThinkNet; print('FastThinkNet path:', FastThinkNet.__file__)" || echo "FastThinkNet import failed"
     - name: Print Python path
       run: |
         python -c "import sys; print('\n'.join(sys.path))"
