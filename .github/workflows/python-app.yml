@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, "3.11.x"]
+        python-version: [3.9, "3.11.x", "3.12.x"]
 
     steps:
     - uses: actions/checkout@v4
@@ -75,21 +75,30 @@ jobs:
     - name: Pre-install ML frameworks logging
       run: echo "Starting installation of ML frameworks"
 
-    - name: Install TensorFlow
-      timeout-minutes: 15
-      run: pip install tensorflow
-
     - name: Install PyTorch
       timeout-minutes: 15
       run: pip install torch torchvision
 
-    - name: Install NVIDIA CUDA libraries
-      timeout-minutes: 20
-      run: |
-        pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 nvidia-cusolver-cu12 nvidia-cusparse-cu12
-
     - name: Post-install ML frameworks logging
       run: echo "Finished installation of ML frameworks"
+
+  tensorflow-job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    needs: build
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11.x"
+    - name: Install TensorFlow
+      timeout-minutes: 15
+      run: |
+        python -m pip install --upgrade pip
+        pip install tensorflow
+    - name: Test TensorFlow Installation
+      run: python -c "import tensorflow as tf; print(tf.__version__)"
 
     - name: Pre-lint logging
       run: echo "Starting linting with flake8"
@@ -185,6 +194,15 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Log Python version
+      run: python --version
+
+    - name: Log pip version
+      run: pip --version
+
+    - name: Log TensorFlow version
+      run: python -c "import tensorflow as tf; print(tf.__version__)"
+
     - name: Cache pip packages
       uses: actions/cache@v4
       with:
@@ -224,10 +242,9 @@ jobs:
       timeout-minutes: 15
       run: pip install torch torchvision
 
-    - name: Install NVIDIA CUDA libraries
-      timeout-minutes: 20
-      run: |
-        pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 nvidia-cusolver-cu12 nvidia-cusparse-cu12
+    # NVIDIA CUDA libraries are already included in the TensorFlow GPU image
+    - name: Log CUDA version
+      run: nvcc --version
 
     - name: Lint with flake8
       run: flake8 .
