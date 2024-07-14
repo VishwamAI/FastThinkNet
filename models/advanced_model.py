@@ -26,7 +26,8 @@ class AdvancedFastThinkNet(nn.Module):
 
         # Attention mechanism
         self.attention = TransformerEncoder(
-            TransformerEncoderLayer(d_model=hidden_dim, nhead=8), num_layers=num_layers
+            TransformerEncoderLayer(d_model=hidden_dim, nhead=8),
+            num_layers=num_layers
         )
 
         # Fully connected layers
@@ -40,9 +41,8 @@ class AdvancedFastThinkNet(nn.Module):
         try:
             # Reshape input if necessary
             if x.dim() == 2:
-                x = x.view(
-                    -1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5)
-                )
+                x = x.view(-1, 1, int(self.input_dim ** 0.5),
+                           int(self.input_dim ** 0.5))
 
             # Convolutional layers
             x = F.relu(self.conv1(x))
