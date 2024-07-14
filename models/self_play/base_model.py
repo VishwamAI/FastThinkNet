@@ -21,6 +21,7 @@ class FastThinkNetSelfPlay(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
 
+
     def generate_self_play_episode(
         self, env
     ) -> Tuple[List[torch.Tensor], List[torch.Tensor], List[float]]:
@@ -43,6 +44,7 @@ class FastThinkNetSelfPlay(nn.Module):
 
         return states, actions, rewards
 
+
     def update_model(
         self,
         states: List[torch.Tensor],
@@ -59,6 +61,7 @@ class FastThinkNetSelfPlay(nn.Module):
         loss.backward()
         self.optimizer.step()
 
+
     def curriculum_learning(
         self, env, num_episodes: int, difficulty_increase_freq: int
     ):
@@ -69,13 +72,16 @@ class FastThinkNetSelfPlay(nn.Module):
             states, actions, rewards = self.generate_self_play_episode(env)
             self.update_model(states, actions, rewards)
 
+
     def store_current_version(self):
         self.past_versions.append(self.state_dict())
+
 
     def load_random_past_version(self):
         if self.past_versions:
             past_version = random.choice(self.past_versions)
             self.load_state_dict(past_version)
+
 
     def integrate_with_components(
         self, deep_learning_model, rl_model, meta_learning_model
@@ -87,9 +93,7 @@ class FastThinkNetSelfPlay(nn.Module):
 # Example usage
 if __name__ == "__main__":
     input_size, hidden_size, output_size = 10, 64, 5
-    self_play_model = FastThinkNetSelfPlay(
-        input_size, hidden_size, output_size
-    )
+    self_play_model = FastThinkNetSelfPlay(input_size, hidden_size, output_size)
 
     # Assuming we have an environment 'env' defined
     # env = YourEnvironment()
@@ -101,7 +105,8 @@ if __name__ == "__main__":
     # self_play_model.update_model(states, actions, rewards)
 
     # Curriculum learning
-    # self_play_model.curriculum_learning(env, num_episodes=1000, difficulty_increase_freq=100)
+    # self_play_model.curriculum_learning(env, num_episodes=1000,
+    #                                    difficulty_increase_freq=100)
 
     # Store and load past versions
     # self_play_model.store_current_version()
@@ -111,4 +116,5 @@ if __name__ == "__main__":
     # deep_learning_model = YourDeepLearningModel()
     # rl_model = YourReinforcementLearningModel()
     # meta_learning_model = YourMetaLearningModel()
-    # self_play_model.integrate_with_components(deep_learning_model, rl_model, meta_learning_model)
+    # self_play_model.integrate_with_components(deep_learning_model, rl_model,
+    #                                          meta_learning_model)
