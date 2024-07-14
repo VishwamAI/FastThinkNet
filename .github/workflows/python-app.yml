@@ -28,6 +28,13 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
     - name: Print Python and pip versions
       run: |
         python --version
@@ -37,16 +44,15 @@ jobs:
         ls -la
         echo "Contents of requirements.txt:"
         cat requirements.txt
-    - name: Clear cache
+    - name: Update requirements.txt
       run: |
-        pip cache purge
-        rm -rf ~/.cache/pip
+        pip freeze > requirements.txt
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt || (echo "pip install failed" && cat /home/runner/.pip/pip.log && exit 1)
         pip install -e . || (echo "FastThinkNet installation failed" && exit 1)
-        pip install torch tensorflow || (echo "PyTorch/TensorFlow installation failed" && exit 1)
+        pip install torch==2.0.1 tensorflow==2.13.0 || (echo "PyTorch/TensorFlow installation failed" && exit 1)
     - name: Debug environment and package installation
       run: |
         echo "Current working directory:"
@@ -72,5 +78,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
     - name: Test with pytest
+      working-directory: ./FastThinkNet
       run: |
         pytest -v -ra
