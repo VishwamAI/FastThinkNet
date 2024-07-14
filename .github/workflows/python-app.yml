@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     strategy:
       matrix:
@@ -49,7 +49,7 @@ jobs:
         pip install -e .
 
     - name: Install development dependencies
-      timeout-minutes: 5
+      timeout-minutes: 20
       run: pip install flake8 black mypy pytest pytest-cov build twine
 
     - name: Install ML frameworks
