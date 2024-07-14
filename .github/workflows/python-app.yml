@@ -251,8 +251,13 @@ jobs:
     - name: Log CUDA version
       run: nvcc --version
 
+    - name: Ensure flake8 is installed
+      run: |
+        pip install flake8
+        flake8 --version
+
     - name: Lint with flake8
-      run: flake8 .
+      run: python -m flake8 .
 
     - name: Check formatting with black
       run: black --check .
