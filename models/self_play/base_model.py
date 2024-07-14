@@ -95,9 +95,7 @@ if __name__ == "__main__":
     # env = YourEnvironment()
 
     # Generate self-play episode
-    # states, actions, rewards = self_play_model.generate_self_play_episode(
-    #     env
-    # )
+    # states, actions, rewards = self_play_model.generate_self_play_episode(env)
 
     # Update model
     # self_play_model.update_model(states, actions, rewards)
