@@ -42,8 +42,8 @@ class FastThinkNetDeepLearning(nn.Module):
                 tensor = module.weight.data.abs()
                 threshold = (
                     tensor.view(-1)
-                    .kthvalue(int(tensor.numel() * pruning_rate))
-                    .values.item()
+                        .kthvalue(int(tensor.numel() * pruning_rate))
+                        .values.item()
                 )
                 mask = tensor.gt(threshold).float()
                 module.weight.data.mul_(mask)
