@@ -1,1 +1,3 @@
-# This file is created to make Python treat the directory as containing packages
+from .pytorch_model import FastThinkNet
+
+__all__ = ['FastThinkNet']
