@@ -19,7 +19,8 @@ def data_pipeline():
 def test_model_initialization(model):
     assert isinstance(model, FastThinkNet)
     assert model.fc1.in_features == 784
-    assert model.fc2.out_features == 10
+    assert model.fc2.out_features == 64
+    assert model.fc3.out_features == 10
 
 def test_forward_pass_different_sizes(model):
     batch_sizes = [1, 16, 32, 64]
