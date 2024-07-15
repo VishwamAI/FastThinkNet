@@ -129,13 +129,11 @@ if __name__ == "__main__":
     # self_play_model.load_random_past_version()
 
     # Integration with other components
-    # deep_learning_model = YourDeepLearningModel()
-    # rl_model = YourReinforcementLearningModel()
-    # meta_learning_model = YourMetaLearningModel()
+    deep_learning_model = YourDeepLearningModel()
+    rl_model = YourReinforcementLearningModel()
+    meta_learning_model = YourMetaLearningModel()
     # self_play_model.integrate_with_components(
-    #     deep_learning_model,
-    #     rl_model,
-    #     meta_learning_model
+    #     deep_learning_model, rl_model, meta_learning_model
     # )
 
 # End of base_model.py
