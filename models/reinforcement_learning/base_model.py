@@ -73,7 +73,9 @@ class FastThinkNetRL:
     def update_value_function(self, states, returns):
         with tf.GradientTape() as tape:
             predicted_values = self.value_network(states)
-            loss = tf.keras.losses.mean_squared_error(returns, predicted_values)
+            loss = tf.keras.losses.mean_squared_error(
+                returns, predicted_values
+            )
 
         grads = tape.gradient(loss, self.value_network.trainable_variables)
         self.value_optimizer.apply_gradients(
