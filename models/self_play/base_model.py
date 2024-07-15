@@ -84,7 +84,7 @@ class FastThinkNetSelfPlay(nn.Module):
         self,
         deep_learning_model,
         rl_model,
-        meta_learning_model,
+        meta_learning_model
     ):
         # Placeholder for integration logic
         pass
@@ -93,7 +93,8 @@ class FastThinkNetSelfPlay(nn.Module):
 # Example usage
 if __name__ == "__main__":
     input_size, hidden_size, output_size = 10, 64, 5
-    self_play_model = FastThinkNetSelfPlay(input_size, hidden_size, output_size)
+    self_play_model = FastThinkNetSelfPlay(input_size, hidden_size,
+                                           output_size)
 
     # Assuming we have an environment 'env' defined
     # env = YourEnvironment()
