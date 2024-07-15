@@ -69,7 +69,9 @@ class FastThinkNetSelfPlay(nn.Module):
             if episode % difficulty_increase_freq == 0:
                 env.increase_difficulty()
 
-            states, actions, rewards = self.generate_self_play_episode(env)
+            states, actions, rewards = self.generate_self_play_episode(
+                env
+            )
             self.update_model(states, actions, rewards)
 
     def store_current_version(self):
