@@ -34,7 +34,7 @@ class FastThinkNetDeepLearning(nn.Module):
 
     def prune(self, pruning_rate=0.1):
         """
-        Implement model pruning to find the shortest program that explains the data.
+        Implement model pruning to find the shortest program that\n        explains the data.
         This is a simple magnitude-based pruning method.
         """
         for name, module in self.named_modules():
