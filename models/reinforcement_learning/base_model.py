@@ -9,7 +9,9 @@ class FastThinkNetRL:
         self.learning_rate = learning_rate
 
         # Policy network
-        self.policy_network = self._build_network(state_dim, action_dim, "policy")
+        self.policy_network = self._build_network(
+            state_dim, action_dim, "policy"
+        )
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # Value network
@@ -18,7 +20,9 @@ class FastThinkNetRL:
 
     def _build_network(self, input_dim, output_dim, name):
         model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+            tf.keras.layers.Dense(
+                64, activation="relu", input_shape=(input_dim,)
+            ),
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(
                 output_dim,
@@ -41,7 +45,9 @@ class FastThinkNetRL:
             while not done:
                 action = self.choose_action(state)
                 next_state, reward, done, _ = env.step(action)
-                episode_experience.append((state, action, reward, next_state, done))
+                episode_experience.append(
+                    (state, action, reward, next_state, done)
+                )
                 state = next_state
             experiences.extend(episode_experience)
         return experiences
@@ -54,7 +60,9 @@ class FastThinkNetRL:
                 action_probs * tf.one_hot(actions, self.action_dim),
                 axis=1
             )
-            loss = -tf.reduce_mean(tf.math.log(selected_action_probs) * advantages)
+            loss = -tf.reduce_mean(
+                tf.math.log(selected_action_probs) * advantages
+            )
 
         grads = tape.gradient(loss, self.policy_network.trainable_variables)
         self.policy_optimizer.apply_gradients(
@@ -66,7 +74,9 @@ class FastThinkNetRL:
     def update_value_function(self, states, returns):
         with tf.GradientTape() as tape:
             predicted_values = self.value_network(states)
-            loss = tf.keras.losses.mean_squared_error(returns, predicted_values)
+            loss = tf.keras.losses.mean_squared_error(
+                returns, predicted_values
+            )
 
         grads = tape.gradient(loss, self.value_network.trainable_variables)
         self.value_optimizer.apply_gradients(
