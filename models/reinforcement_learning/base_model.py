@@ -24,7 +24,7 @@ class FastThinkNetRL:
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(
                 output_dim,
-                activation="softmax" if name == "policy" else None,
+                activation="softmax" if name == "policy" else None
             ),
         ])
         return model
@@ -104,8 +104,8 @@ class FastThinkNetRL:
             if episode % 10 == 0:
                 print(
                     f"Episode {episode}, "
-                    f"Policy Loss: {policy_loss.numpy()}, "
-                    f"Value Loss: {value_loss.numpy()}"
+                    f"Policy Loss: {policy_loss.numpy():.4f}, "
+                    f"Value Loss: {value_loss.numpy():.4f}"
                 )
 
     def integrate_with_dl_model(self, dl_model):
