@@ -28,7 +28,9 @@ class FastThinkNetMeta(nn.Module):
         task_model = self.clone()
 
         for _ in range(num_inner_steps):
-            task_loss = nn.functional.mse_loss(task_model(x_support), y_support)
+            task_loss = nn.functional.mse_loss(
+                task_model(x_support), y_support
+            )
             task_model.adapt(task_loss)
 
         return task_model
@@ -49,8 +51,12 @@ class FastThinkNetMeta(nn.Module):
             x_support, y_support = task
             x_query, y_query = task
 
-            task_model = self.inner_loop((x_support, y_support), num_inner_steps)
-            task_loss = nn.functional.mse_loss(task_model(x_query), y_query)
+            task_model = self.inner_loop(
+                (x_support, y_support), num_inner_steps
+            )
+            task_loss = nn.functional.mse_loss(
+                task_model(x_query), y_query
+            )
             meta_loss += task_loss
 
         self.meta_optimizer.zero_grad()
