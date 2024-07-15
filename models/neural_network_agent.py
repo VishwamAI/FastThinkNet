@@ -20,7 +20,9 @@ class NeuralNetworkAgent:
             ]
         )
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
+            optimizer=tf.keras.optimizers.Adam(
+                learning_rate=self.learning_rate
+            ),
             loss="mse",
         )
         return model
@@ -36,7 +38,9 @@ class NeuralNetworkAgent:
         if done:
             target[0][action] = reward
         else:
-            q_future = np.max(self.model.predict(next_state[np.newaxis, ...])[0])
+            q_future = np.max(
+                self.model.predict(next_state[np.newaxis, ...])[0]
+            )
             target[0][action] = reward + 0.99 * q_future
         self.model.fit(state[np.newaxis, ...], target, epochs=1, verbose=0)
 
