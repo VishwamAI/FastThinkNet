@@ -28,7 +28,9 @@ class FastThinkNetMeta(nn.Module):
         task_model = self.clone()
 
         for _ in range(num_inner_steps):
-            task_loss = nn.functional.mse_loss(task_model(x_support), y_support)
+            task_loss = nn.functional.mse_loss(
+                task_model(x_support), y_support
+            )
             task_model.adapt(task_loss)
 
         return task_model
@@ -77,7 +79,9 @@ class FastThinkNetMeta(nn.Module):
         # This method should be implemented to integrate with deep learning
         # and reinforcement learning components
         # For now, we'll return a simple sequential model as a placeholder
-        return nn.Sequential(self.base_model, dl_model, rl_model)
+        return nn.Sequential(
+            self.base_model, dl_model, rl_model
+        )
 
 
 # Example usage
