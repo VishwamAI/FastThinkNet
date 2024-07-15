@@ -99,9 +99,7 @@ if __name__ == "__main__":
     # env = YourEnvironment()
 
     # Generate self-play episode
-    # states, actions, rewards = self_play_model.generate_self_play_episode(
-    #     env
-    # )
+    # states, actions, rewards = self_play_model.generate_self_play_episode(env)
 
     # Update model
     # self_play_model.update_model(states, actions, rewards)
@@ -122,6 +120,5 @@ if __name__ == "__main__":
     # rl_model = YourReinforcementLearningModel()
     # meta_learning_model = YourMetaLearningModel()
     # self_play_model.integrate_with_components(
-    #     deep_learning_model, rl_model,
-    #     meta_learning_model
+    #     deep_learning_model, rl_model, meta_learning_model
     # )
