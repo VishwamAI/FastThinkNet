@@ -91,7 +91,8 @@ class FastThinkNetSelfPlay(nn.Module):
         TODO: Implement this method to combine the self-play model with:
         1. Deep learning model: For feature extraction or policy
            improvement
-        2. RL model: For advanced policy optimization (e.g., PPO, A2C)
+        2. RL model: For advanced policy optimization (e.g., PPO, \
+           A2C)
         3. Meta-learning model: For rapid adaptation to new
            tasks/environments
 
