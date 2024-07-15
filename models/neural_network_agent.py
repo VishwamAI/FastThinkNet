@@ -93,7 +93,8 @@ class NeuralNetworkAgent:
                     next_states = np.concatenate(next_states)
 
                     self.update(
-                        self.model, states, next_states, rewards, actions, gamma
+                        self.model, states, next_states,
+                        rewards, actions, gamma
                     )
 
             episode_rewards.append(total_reward)
@@ -102,7 +103,8 @@ class NeuralNetworkAgent:
             if episode % 100 == 0:
                 print(
                     f"Episode: {episode}, Avg Reward: "
-                    f"{np.mean(episode_rewards[-100:]):.2f}, Epsilon: {epsilon:.2f}"
+                    f"{np.mean(episode_rewards[-100:]):.2f}, "
+                    f"Epsilon: {epsilon:.2f}"
                 )
 
         return episode_rewards
