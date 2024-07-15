@@ -29,3 +29,5 @@ pytest
 tensorflow
 numpy
 tqdm
+
+# Dependencies for neural-learning-agent are included in the above list
