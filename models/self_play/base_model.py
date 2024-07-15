@@ -6,12 +6,15 @@ from typing import List, Tuple
 
 
 class FastThinkNetSelfPlay(nn.Module):
-    def __init__(self, input_size: int, hidden_size: int, output_size: int):
+    def __init__(self, input_shape=(64, 64, 3), hidden_size=64, output_size=5):
         super(FastThinkNetSelfPlay, self).__init__()
         self.model = nn.Sequential(
-            nn.Linear(input_size, hidden_size),
+            nn.Conv2d(input_shape[2], 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Linear(hidden_size, hidden_size),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(64 * input_shape[0] * input_shape[1], hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, output_size),
         )
@@ -21,41 +24,51 @@ class FastThinkNetSelfPlay(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
 
+    def act(self, state: torch.Tensor, epsilon: float = 0.1) -> int:
+        if random.random() < epsilon:
+            return random.randint(0, self.model[-1].out_features - 1)
+        else:
+            with torch.no_grad():
+                q_values = self.forward(state)
+                return torch.argmax(q_values).item()
+
     def generate_self_play_episode(
         self, env
-    ) -> Tuple[List[torch.Tensor], List[torch.Tensor], List[float]]:
-        states, actions, rewards = [], [], []
+    ) -> List[Tuple[torch.Tensor, int, float, torch.Tensor, bool]]:
+        experiences = []
         state = env.reset()
         done = False
 
         while not done:
             state_tensor = torch.FloatTensor(state).unsqueeze(0)
-            action_probs = self.forward(state_tensor).squeeze(0)
-            action = torch.multinomial(action_probs, 1).item()
-
+            action = self.act(state_tensor)
             next_state, reward, done, _ = env.step(action)
+            next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0)
 
-            states.append(state_tensor)
-            actions.append(action)
-            rewards.append(reward)
-
+            experiences.append((state_tensor, action, reward, next_state_tensor, done))
             state = next_state
 
-        return states, actions, rewards
+        return experiences
 
-    def update_model(
-        self,
-        states: List[torch.Tensor],
-        actions: List[torch.Tensor],
-        rewards: List[float],
-    ):
+    def update_model(self, replay_buffer, batch_size: int = 32):
+        if len(replay_buffer) < batch_size:
+            return
+
+        batch = random.sample(replay_buffer, batch_size)
+        states, actions, rewards, next_states, dones = zip(*batch)
+
+        states = torch.cat(states)
+        next_states = torch.cat(next_states)
+        actions = torch.tensor(actions)
+        rewards = torch.tensor(rewards)
+        dones = torch.tensor(dones)
+
+        current_q_values = self.forward(states).gather(1, actions.unsqueeze(1))
+        next_q_values = self.forward(next_states).max(1)[0]
+        target_q_values = rewards + (1 - dones.float()) * 0.99 * next_q_values
+
+        loss = nn.MSELoss()(current_q_values, target_q_values.unsqueeze(1))
         self.optimizer.zero_grad()
-        loss = 0
-
-        for state, action, reward in zip(states, actions, rewards):
-            action_probs = self.forward(state)
-            loss -= torch.log(action_probs[action]) * reward
-
         loss.backward()
         self.optimizer.step()
 
@@ -64,13 +77,16 @@ class FastThinkNetSelfPlay(nn.Module):
         env,
         num_episodes: int,
         difficulty_increase_freq: int,
+        batch_size: int = 32
     ):
+        replay_buffer = []
         for episode in range(num_episodes):
             if episode % difficulty_increase_freq == 0:
                 env.increase_difficulty()
 
-            states, actions, rewards = self.generate_self_play_episode(env)
-            self.update_model(states, actions, rewards)
+            experiences = self.generate_self_play_episode(env)
+            replay_buffer.extend(experiences)
+            self.update_model(replay_buffer, batch_size)
 
     def store_current_version(self):
         self.past_versions.append(self.state_dict())
@@ -105,17 +121,19 @@ class FastThinkNetSelfPlay(nn.Module):
 
 # Example usage
 if __name__ == "__main__":
-    input_size, hidden_size, output_size = 10, 64, 5
-    self_play_model = FastThinkNetSelfPlay(input_size, hidden_size, output_size)
+    input_shape, hidden_size, output_size = (64, 64, 3), 64, 5
+    self_play_model = FastThinkNetSelfPlay(input_shape, hidden_size, output_size)
 
     # Assuming we have an environment 'env' defined
     # env = YourEnvironment()
 
     # Generate self-play episode
-    # states, actions, rewards = self_play_model.generate_self_play_episode(env)
+    # experiences = self_play_model.generate_self_play_episode(env)
 
     # Update model
-    # self_play_model.update_model(states, actions, rewards)
+    # replay_buffer = []
+    # replay_buffer.extend(experiences)
+    # self_play_model.update_model(replay_buffer)
 
     # Curriculum learning
     # self_play_model.curriculum_learning(
