@@ -63,15 +63,13 @@ class FastThinkNetSelfPlay(nn.Module):
         self,
         env,
         num_episodes: int,
-        difficulty_increase_freq: int
+        difficulty_increase_freq: int,
     ):
         for episode in range(num_episodes):
             if episode % difficulty_increase_freq == 0:
                 env.increase_difficulty()
 
-            states, actions, rewards = self.generate_self_play_episode(
-                env
-            )
+            states, actions, rewards = self.generate_self_play_episode(env)
             self.update_model(states, actions, rewards)
 
     def store_current_version(self):
@@ -86,7 +84,7 @@ class FastThinkNetSelfPlay(nn.Module):
         self,
         deep_learning_model,
         rl_model,
-        meta_learning_model
+        meta_learning_model,
     ):
         # Placeholder for integration logic
         pass
