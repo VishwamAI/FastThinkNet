@@ -9,32 +9,30 @@ class NeuralNetworkAgent:
         self.model = self.create_model()
 
     def create_model(self):
-        model = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(32, (3, 3), input_shape=self.input_shape,
-                                   padding='same'),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Activation('relu'),
-            tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.MaxPooling2D((2, 2)),
-
-            tf.keras.layers.Conv2D(64, (3, 3), padding='same'),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Activation('relu'),
-            tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.MaxPooling2D((2, 2)),
-
-            tf.keras.layers.Flatten(),
-
-            tf.keras.layers.Dense(128),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Activation('relu'),
-            tf.keras.layers.Dropout(0.3),
-
-            tf.keras.layers.Dense(self.action_space, activation='linear')
-        ])
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Conv2D(
+                    32, (3, 3), input_shape=self.input_shape, padding="same"
+                ),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
+                tf.keras.layers.Dropout(0.2),
+                tf.keras.layers.MaxPooling2D((2, 2)),
+                tf.keras.layers.Conv2D(64, (3, 3), padding="same"),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
+                tf.keras.layers.Dropout(0.2),
+                tf.keras.layers.MaxPooling2D((2, 2)),
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(128),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
+                tf.keras.layers.Dropout(0.3),
+                tf.keras.layers.Dense(self.action_space, activation="linear"),
+            ]
+        )
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-            loss='mse'
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse"
         )
         return model
 
@@ -49,8 +47,16 @@ class NeuralNetworkAgent:
         gamma = 0.99  # Consider making this a class attribute or parameter
         self.update(self.model, initial_state, next_state, [reward], [action], gamma)
 
-    def train(self, env, episodes=2000, gamma=0.99, epsilon_start=1.0,
-              epsilon_end=0.01, epsilon_decay=0.995, batch_size=32):
+    def train(
+        self,
+        env,
+        episodes=2000,
+        gamma=0.99,
+        epsilon_start=1.0,
+        epsilon_end=0.01,
+        epsilon_decay=0.995,
+        batch_size=32,
+    ):
         epsilon = epsilon_start
         memory = []
         episode_rewards = []
@@ -77,21 +83,25 @@ class NeuralNetworkAgent:
 
                 if len(memory) > batch_size:
                     batch = np.random.choice(len(memory), batch_size, replace=False)
-                    states, actions, rewards, next_states, dones = zip(*[memory[i]
-                                                                         for i in batch])
+                    states, actions, rewards, next_states, dones = zip(
+                        *[memory[i] for i in batch]
+                    )
 
                     states = np.concatenate(states)
                     next_states = np.concatenate(next_states)
 
-                    self.update(self.model, states, next_states, rewards, actions,
-                                gamma)
+                    self.update(
+                        self.model, states, next_states, rewards, actions, gamma
+                    )
 
             episode_rewards.append(total_reward)
             epsilon = max(epsilon_end, epsilon * epsilon_decay)
 
             if episode % 100 == 0:
-                print(f"Episode: {episode}, Avg Reward: "
-                      f"{np.mean(episode_rewards[-100:]):.2f}, Epsilon: {epsilon:.2f}")
+                print(
+                    f"Episode: {episode}, Avg Reward: "
+                    f"{np.mean(episode_rewards[-100:]):.2f}, Epsilon: {epsilon:.2f}"
+                )
 
         return episode_rewards
 
