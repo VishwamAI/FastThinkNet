@@ -94,9 +94,7 @@ class FastThinkNetSelfPlay(nn.Module):
 if __name__ == "__main__":
     input_size, hidden_size, output_size = 10, 64, 5
     self_play_model = FastThinkNetSelfPlay(
-        input_size,
-        hidden_size,
-        output_size
+        input_size, hidden_size, output_size
     )
 
     # Assuming we have an environment 'env' defined
