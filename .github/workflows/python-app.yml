@@ -120,6 +120,12 @@ jobs:
     - name: Install black
       run: pip install black
 
+    - name: Print black version
+      run: black --version
+
+    - name: Print black command
+      run: echo "black --check ."
+
     - name: Check formatting with black
       run: black --check .
 
@@ -261,6 +267,12 @@ jobs:
 
     - name: Lint with flake8
       run: python -m flake8 .
+
+    - name: Print black version
+      run: black --version
+
+    - name: Print black command
+      run: echo "black --check ."
 
     - name: Check formatting with black
       run: black --check .
