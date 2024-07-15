@@ -26,3 +26,6 @@ Werkzeug==3.0.3
 gym
 matplotlib
 pytest
+tensorflow
+numpy
+tqdm
