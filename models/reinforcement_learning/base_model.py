@@ -19,15 +19,18 @@ class FastThinkNetRL:
         self.value_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
     def _build_network(self, input_dim, output_dim, name):
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation="relu",
-                                  input_shape=(input_dim,)),
-            tf.keras.layers.Dense(64, activation="relu"),
-            tf.keras.layers.Dense(
-                output_dim,
-                activation="softmax" if name == "policy" else None
-            ),
-        ])
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Dense(
+                    64, activation="relu", input_shape=(input_dim,)
+                ),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(
+                    output_dim,
+                    activation="softmax" if name == "policy" else None,
+                ),
+            ]
+        )
         return model
 
     def choose_action(self, state):
@@ -56,8 +59,7 @@ class FastThinkNetRL:
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
             selected_action_probs = tf.reduce_sum(
-                action_probs * tf.one_hot(actions, self.action_dim),
-                axis=1
+                action_probs * tf.one_hot(actions, self.action_dim), axis=1
             )
             loss = -tf.reduce_mean(
                 tf.math.log(selected_action_probs) * advantages
