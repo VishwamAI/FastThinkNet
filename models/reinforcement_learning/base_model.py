@@ -9,7 +9,9 @@ class FastThinkNetRL:
         self.learning_rate = learning_rate
 
         # Policy network
-        self.policy_network = self._build_network(state_dim, action_dim, "policy")
+        self.policy_network = self._build_network(
+            state_dim, action_dim, "policy"
+        )
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # Value network
