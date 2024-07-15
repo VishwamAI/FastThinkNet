@@ -103,9 +103,11 @@ class FastThinkNetRL:
             value_loss = self.update_value_function(states, returns)
 
             if episode % 10 == 0:
-                print(f"Episode {episode}, "
-                      f"Policy Loss: {policy_loss.numpy():.4f}, "
-                      f"Value Loss: {value_loss.numpy():.4f}")
+                print(
+                    f"Episode {episode}, "
+                    f"Policy Loss: {policy_loss.numpy():.4f}, "
+                    f"Value Loss: {value_loss.numpy():.4f}"
+                )
 
     def integrate_with_dl_model(self, dl_model):
         # This method would be implemented to integrate with the deep learning
