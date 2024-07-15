@@ -98,8 +98,8 @@ class FastThinkNetSelfPlay(nn.Module):
 
         Implementation considerations:
         - Ensure compatibility of input/output formats between models
-        - Define how each model contributes to the overall
-          decision-making process
+        - Define how each model contributes to the overall decision-making
+          process
         - Consider using ensemble methods or hierarchical structures
         - Implement mechanisms for knowledge transfer between components
         - Add error handling for incompatible model types
