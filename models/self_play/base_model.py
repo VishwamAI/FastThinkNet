@@ -9,13 +9,12 @@ class FastThinkNetSelfPlay(nn.Module):
     def __init__(self, input_shape=(64, 64, 3), output_size=5):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Conv2d(input_shape[2], 32, kernel_size=3, stride=1,
-                      padding='same'),
+            nn.Conv2d(input_shape[2], 32, kernel_size=3, stride=1, padding="same"),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.MaxPool2d(2, 2),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding='same'),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding="same"),
             nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.Dropout(0.2),
@@ -25,7 +24,7 @@ class FastThinkNetSelfPlay(nn.Module):
             nn.BatchNorm1d(128),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(128, output_size)
+            nn.Linear(128, output_size),
         )
         self.optimizer = optim.Adam(self.parameters(), lr=0.001)
         self.past_versions: List[nn.Module] = []
@@ -68,8 +67,7 @@ class FastThinkNetSelfPlay(nn.Module):
             next_state, reward, done, _ = env.step(action)
             next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0)
 
-            experiences.append((state_tensor, action, reward,
-                                next_state_tensor, done))
+            experiences.append((state_tensor, action, reward, next_state_tensor, done))
             state = next_state
 
         return experiences
@@ -105,7 +103,7 @@ class FastThinkNetSelfPlay(nn.Module):
         env,
         num_episodes: int,
         difficulty_increase_freq: int,
-        batch_size: int = 32
+        batch_size: int = 32,
     ):
         replay_buffer = []
         for episode in range(num_episodes):
@@ -125,10 +123,7 @@ class FastThinkNetSelfPlay(nn.Module):
             self.load_state_dict(past_version)
 
     def integrate_with_components(
-        self,
-        deep_learning_model,
-        rl_model,
-        meta_learning_model
+        self, deep_learning_model, rl_model, meta_learning_model
     ):
         """
         Integrate the self-play model with other components of FastThinkNet.
@@ -157,14 +152,12 @@ class FastThinkNetSelfPlay(nn.Module):
         # Implement knowledge transfer
         def transfer_knowledge():
             # Transfer learned features from deep learning model
-            self.model[0].weight.data = (
-                deep_learning_model.feature_extractor[0].weight.data.clone()
-            )
+            self.model[0].weight.data = deep_learning_model.feature_extractor[
+                0
+            ].weight.data.clone()
 
             # Transfer policy from RL model
-            self.model[-1].weight.data = (
-                rl_model.policy_net[-1].weight.data.clone()
-            )
+            self.model[-1].weight.data = rl_model.policy_net[-1].weight.data.clone()
 
         self.transfer_knowledge = transfer_knowledge
 
