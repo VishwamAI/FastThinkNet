@@ -9,7 +9,8 @@ class FastThinkNetSelfPlay(nn.Module):
     def __init__(self, input_shape=(64, 64, 3), output_size=5):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Conv2d(input_shape[2], 32, kernel_size=3, stride=1, padding="same"),
+            nn.Conv2d(input_shape[2], 32, kernel_size=3,
+                      stride=1, padding="same"),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.Dropout(0.2),
