@@ -119,7 +119,5 @@ if __name__ == "__main__":
     # deep_learning_model = YourDeepLearningModel()
     # rl_model = YourReinforcementLearningModel()
     # meta_learning_model = YourMetaLearningModel()
-    # self_play_model.integrate_with_components(
-    #     deep_learning_model, rl_model,
-    #     meta_learning_model
-    # )
+    # self_play_model.integrate_with_components(deep_learning_model, rl_model,
+    #                                           meta_learning_model)
