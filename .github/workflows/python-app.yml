@@ -117,6 +117,9 @@ jobs:
     - name: Pre-check formatting logging
       run: echo "Starting formatting check with black"
 
+    - name: Install black
+      run: pip install black
+
     - name: Check formatting with black
       run: black --check .
 
