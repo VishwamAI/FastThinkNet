@@ -60,7 +60,9 @@ class FastThinkNetSelfPlay(nn.Module):
         self.optimizer.step()
 
     def curriculum_learning(
-        self, env, num_episodes: int,
+        self,
+        env,
+        num_episodes: int,
         difficulty_increase_freq: int
     ):
         for episode in range(num_episodes):
@@ -119,8 +121,8 @@ if __name__ == "__main__":
     # deep_learning_model = YourDeepLearningModel()
     # rl_model = YourReinforcementLearningModel()
     # meta_learning_model = YourMetaLearningModel()
-    self_play_model.integrate_with_components(
-        deep_learning_model,
-        rl_model,
-        meta_learning_model
-    )
+    # self_play_model.integrate_with_components(
+    #     deep_learning_model,
+    #     rl_model,
+    #     meta_learning_model
+    # )
