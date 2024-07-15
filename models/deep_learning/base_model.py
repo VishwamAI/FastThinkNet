@@ -53,3 +53,5 @@ class FastThinkNetDeepLearning(nn.Module):
 # x = torch.randn(1, 3, 32, 32)
 # output = model(x)
 # model.prune(pruning_rate=0.1)
+
+# This comment ensures git recognizes the file changes
