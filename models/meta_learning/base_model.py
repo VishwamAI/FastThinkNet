@@ -77,7 +77,11 @@ class FastThinkNetMeta(nn.Module):
         # This method should be implemented to integrate with deep learning
         # and reinforcement learning components
         # For now, we'll return a simple sequential model as a placeholder
-        return nn.Sequential(self.base_model, dl_model, rl_model)
+        return nn.Sequential(
+            self.base_model,
+            dl_model,
+            rl_model
+        )
 
 
 # Example usage
