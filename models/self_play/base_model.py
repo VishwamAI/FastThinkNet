@@ -67,7 +67,8 @@ class FastThinkNetSelfPlay(nn.Module):
             next_state, reward, done, _ = env.step(action)
             next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0)
 
-            experiences.append((state_tensor, action, reward, next_state_tensor, done))
+            experiences.append((state_tensor, action, reward,
+                                next_state_tensor, done))
             state = next_state
 
         return experiences
@@ -155,10 +156,14 @@ class FastThinkNetSelfPlay(nn.Module):
         # Implement knowledge transfer
         def transfer_knowledge():
             # Transfer learned features from deep learning model
-            self.model[0].weight.data = deep_learning_model.feature_extractor[0].weight.data.clone()
+            self.model[0].weight.data = (
+                deep_learning_model.feature_extractor[0].weight.data.clone()
+            )
 
             # Transfer policy from RL model
-            self.model[-1].weight.data = rl_model.policy_net[-1].weight.data.clone()
+            self.model[-1].weight.data = (
+                rl_model.policy_net[-1].weight.data.clone()
+            )
 
         self.transfer_knowledge = transfer_knowledge
 
@@ -168,7 +173,7 @@ class FastThinkNetSelfPlay(nn.Module):
 # Example usage
 if __name__ == "__main__":
     input_shape, hidden_size, output_size = (64, 64, 3), 64, 5
-    self_play_model = FastThinkNetSelfPlay(input_shape, hidden_size, output_size)
+    self_play_model = FastThinkNetSelfPlay(input_shape, output_size)
 
     # Assuming we have an environment 'env' defined
     # env = YourEnvironment()
