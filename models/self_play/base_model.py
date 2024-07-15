@@ -81,7 +81,10 @@ class FastThinkNetSelfPlay(nn.Module):
             self.load_state_dict(past_version)
 
     def integrate_with_components(
-        self, deep_learning_model, rl_model, meta_learning_model
+        self,
+        deep_learning_model,
+        rl_model,
+        meta_learning_model
     ):
         """
         Placeholder for integration logic with other components.
