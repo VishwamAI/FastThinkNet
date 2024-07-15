@@ -60,7 +60,8 @@ class FastThinkNetSelfPlay(nn.Module):
         self.optimizer.step()
 
     def curriculum_learning(
-        self, env, num_episodes: int, difficulty_increase_freq: int
+        self, env, num_episodes: int,
+        difficulty_increase_freq: int
     ):
         for episode in range(num_episodes):
             if episode % difficulty_increase_freq == 0:
