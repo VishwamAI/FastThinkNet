@@ -101,8 +101,7 @@ class FastThinkNetSelfPlay(nn.Module):
         - Define how each model contributes to the overall decision-making
           process
         - Consider using ensemble methods or hierarchical structures
-        - Implement mechanisms for knowledge transfer between
-          components
+        - Implement mechanisms for knowledge transfer between components
         - Add error handling for incompatible model types
         """
         pass
