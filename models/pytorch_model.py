@@ -9,7 +9,7 @@ class FastThinkNet(nn.Module):
     def __init__(self):
         super(FastThinkNet, self).__init__()
         # Define layers
-        self.fc1 = nn.Linear(in_features=784, out_features=128)  # Input size for MNIST
+        self.fc1 = nn.Linear(in_features=784, out_features=128)  # MNIST input
         self.fc2 = nn.Linear(in_features=128, out_features=10)  # Output layer
 
     def forward(self, x):
