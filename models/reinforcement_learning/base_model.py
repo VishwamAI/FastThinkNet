@@ -20,7 +20,8 @@ class FastThinkNetRL:
 
     def _build_network(self, input_dim, output_dim, name):
         model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+            tf.keras.layers.Dense(64, activation="relu",
+                                  input_shape=(input_dim,)),
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(
                 output_dim,
