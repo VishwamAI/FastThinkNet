@@ -3,7 +3,8 @@ import numpy as np
 
 
 class FastThinkNetRL:
-    def __init__(self, state_dim, action_dim, learning_rate=0.001):
+    def __init__(self, state_dim, action_dim,
+                 learning_rate=0.001):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.learning_rate = learning_rate
