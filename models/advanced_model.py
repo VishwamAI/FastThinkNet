@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4):
+    def __init__(self, input_dim=784, hidden_dim=256,
+                 output_dim=10, num_layers=4):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
