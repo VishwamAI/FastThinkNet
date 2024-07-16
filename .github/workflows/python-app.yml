@@ -29,7 +29,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python-version }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python-version }}-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
@@ -103,10 +103,11 @@ jobs:
     - name: Pre-lint logging
       run: echo "Starting linting with flake8"
 
-    - name: Ensure flake8 is installed
+    - name: Ensure flake8 is installed and up-to-date
       run: |
-        pip install flake8
+        pip install --upgrade flake8
         flake8 --version
+
 
     - name: Lint with flake8
       run: python -m flake8 .
@@ -221,7 +222,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-3.12
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-3.12-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
@@ -262,7 +263,7 @@ jobs:
 
     - name: Ensure flake8 is installed
       run: |
-        pip install flake8
+        pip install --upgrade flake8
         flake8 --version
 
     - name: Lint with flake8
