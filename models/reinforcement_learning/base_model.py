@@ -16,7 +16,9 @@ class FastThinkNetRL:
 
         # Value network
         self.value_network = self._build_network(state_dim, 1, "value")
-        self.target_value_network = self._build_network(state_dim, 1, "target_value")
+        self.target_value_network = self._build_network(
+            state_dim, 1, "target_value"
+        )
         self.value_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # PPO hyperparameters
@@ -26,7 +28,9 @@ class FastThinkNetRL:
 
     def _build_network(self, input_dim, output_dim, name):
         model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+            tf.keras.layers.Dense(
+                64, activation="relu", input_shape=(input_dim,)
+            ),
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(
                 output_dim,
@@ -64,7 +68,9 @@ class FastThinkNetRL:
                 action_probs * tf.one_hot(actions, self.action_dim), axis=1
             )
             ratio = selected_action_probs / old_probs
-            clipped_ratio = tf.clip_by_value(ratio, 1 - self.epsilon, 1 + self.epsilon)
+            clipped_ratio = tf.clip_by_value(
+                ratio, 1 - self.epsilon, 1 + self.epsilon
+            )
             policy_loss = -tf.reduce_mean(
                 tf.minimum(ratio * advantages, clipped_ratio * advantages)
             )
