@@ -111,8 +111,11 @@ jobs:
     - name: Display content of base_model.py
       run: cat ./models/reinforcement_learning/base_model.py
 
+    - name: Display content of .flake8
+      run: cat .flake8
+
     - name: Lint with flake8
-      run: python -m flake8 .
+      run: python -m flake8 --config=.flake8 .
 
     - name: Post-lint logging
       run: echo "Finished linting with flake8"
