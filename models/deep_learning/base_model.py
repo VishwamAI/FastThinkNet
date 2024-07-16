@@ -1,6 +1,6 @@
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 
 class FastThinkNetDeepLearning(nn.Module):
     def __init__(self, input_channels=3, num_classes=10):
@@ -34,18 +34,24 @@ class FastThinkNetDeepLearning(nn.Module):
 
     def prune(self, pruning_rate=0.1):
         """
-        Implement model pruning to find the shortest program that explains the data.
-        This is a simple magnitude-based pruning method.
+        Implement model pruning to find the shortest program that
+        explains the data. This is a simple magnitude-based pruning method.
         """
         for name, module in self.named_modules():
-            if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
+            if isinstance(module, (nn.Conv2d, nn.Linear)):
                 tensor = module.weight.data.abs()
-                threshold = tensor.view(-1).kthvalue(int(tensor.numel() * pruning_rate)).values
+                threshold_value = int(tensor.numel() * pruning_rate)
+                tensor_flat = tensor.view(-1)
+                threshold = tensor_flat.kthvalue(threshold_value).values.item()
                 mask = tensor.gt(threshold).float()
                 module.weight.data.mul_(mask)
+
 
 # Example usage:
 # model = FastThinkNetDeepLearning(input_channels=3, num_classes=10)
 # x = torch.randn(1, 3, 32, 32)
 # output = model(x)
 # model.prune(pruning_rate=0.1)
+
+# This comment ensures git recognizes the file changes
+# Additional comment to force git to recognize changes

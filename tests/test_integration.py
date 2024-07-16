@@ -1,20 +1,22 @@
-# Import necessary modules
-import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import torch
-import tensorflow as tf
+import sys
 import pytest
+import torch
 from models.pytorch_model import FastThinkNet
 from scripts.tf_data_pipeline import create_data_pipeline
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 @pytest.fixture
 def model():
     return FastThinkNet()
 
+
 @pytest.fixture
 def data_pipeline():
     return create_data_pipeline()
+
 
 def test_model_initialization(model):
     assert isinstance(model, FastThinkNet)
@@ -23,12 +25,14 @@ def test_model_initialization(model):
     assert model.fc2.out_features == 64
     assert model.fc3.out_features == 10
 
+
 def test_forward_pass_different_sizes(model):
     batch_sizes = [1, 16, 32, 64]
     for batch_size in batch_sizes:
         input_data = torch.randn(batch_size, 784)
         output = model(input_data)
         assert output.shape == (batch_size, 10)
+
 
 def test_basic_training_loop(model, data_pipeline):
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -50,6 +54,7 @@ def test_basic_training_loop(model, data_pipeline):
 
     assert loss.item() < initial_loss, "Loss should decrease during training"
 
+
 def test_integration(model, data_pipeline):
     for images, labels in data_pipeline.take(1):
         # Convert TensorFlow tensors to PyTorch tensors
@@ -68,7 +73,11 @@ def test_integration(model, data_pipeline):
         outputs = model(images)
 
         # Check if the outputs are of the expected shape
-        assert outputs.shape == (32, 10), f"Output shape is incorrect. Expected (32, 10), got {outputs.shape}"
+        assert outputs.shape == (
+            32,
+            10,
+        ), f"Output shape is incorrect. Expected (32, 10), got {outputs.shape}"
+
 
 def test_error_handling(model):
     with pytest.raises(RuntimeError):
@@ -76,12 +85,14 @@ def test_error_handling(model):
         invalid_input = torch.randn(32, 100)  # Incorrect input size
         model(invalid_input)
 
+
 def test_gpu_support():
     if torch.cuda.is_available():
         model = FastThinkNet().cuda()
         assert next(model.parameters()).is_cuda
     else:
         pytest.skip("CUDA is not available, skipping GPU test")
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

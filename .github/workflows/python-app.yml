@@ -8,12 +8,12 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    timeout-minutes: 90
 
     strategy:
       matrix:
-        python-version: [3.9, 3.11, 3.12]
+        python-version: [3.9, "3.11.x", "3.12.x"]
 
     steps:
     - uses: actions/checkout@v4
@@ -25,6 +25,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python-version }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Print Python and pip versions
       run: |
         python --version
@@ -33,28 +41,267 @@ jobs:
     - name: List directory contents
       run: ls -la
 
-    - name: Clear cache
-      run: |
-        pip cache purge
-        rm -rf ~/.cache/pip
+    - name: Pre-install project dependencies logging
+      run: echo "Starting installation of project dependencies"
 
-    - name: Install dependencies
+    - name: Install project dependencies
+      timeout-minutes: 60
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
-        pip install torch tensorflow
+
+    - name: Post-install project dependencies logging
+      run: echo "Finished installation of project dependencies"
+
+    - name: Pre-install development dependencies logging
+      run: echo "Starting installation of development dependencies"
+
+    - name: Install linting tools
+      timeout-minutes: 10
+      run: pip install flake8 black mypy
+
+    - name: Install testing tools
+      timeout-minutes: 10
+      run: pip install pytest pytest-cov
+
+    - name: Install build tools
+      timeout-minutes: 10
+      run: pip install build twine
+
+    - name: Post-install development dependencies logging
+      run: echo "Finished installation of development dependencies"
+
+    - name: Pre-install ML frameworks logging
+      run: echo "Starting installation of ML frameworks"
+
+    - name: Install PyTorch
+      timeout-minutes: 15
+      run: pip install torch torchvision
+
+    - name: Post-install ML frameworks logging
+      run: echo "Finished installation of ML frameworks"
+
+  tensorflow-job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    needs: build
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11.x"
+    - name: Install TensorFlow
+      timeout-minutes: 15
+      run: |
+        python -m pip install --upgrade pip
+        pip install tensorflow
+    - name: Test TensorFlow Installation
+      run: python -c "import tensorflow as tf; print(tf.__version__)"
+
+    - name: Pre-lint logging
+      run: echo "Starting linting with flake8"
+
+    - name: Ensure flake8 is installed
+      run: |
+        pip install flake8
+        flake8 --version
+
+    - name: Lint with flake8
+      run: python -m flake8 .
+
+    - name: Post-lint logging
+      run: echo "Finished linting with flake8"
+
+    - name: Pre-check formatting logging
+      run: echo "Starting formatting check with black"
+
+    - name: Install black
+      run: pip install black
+
+    - name: Print black version
+      run: black --version
+
+    - name: Print black command
+      run: echo "black --check ."
+
+    - name: Check formatting with black
+      run: black --check .
+
+    - name: Post-check formatting logging
+      run: echo "Finished formatting check with black"
+
+    - name: Pre-type check logging
+      run: echo "Starting type check with mypy"
+
+    - name: Type check with mypy
+      run: mypy .
+
+    - name: Post-type check logging
+      run: echo "Finished type check with mypy"
+
+    - name: Pre-Test FastThinkNet import logging
+      run: echo "Starting FastThinkNet import test"
 
     - name: Test FastThinkNet import
       run: python -c "import FastThinkNet; print(FastThinkNet.__version__)"
 
-    - name: Check CUDA availability
+    - name: Post-Test FastThinkNet import logging
+      run: echo "Finished FastThinkNet import test"
+
+    - name: Pre-run tests logging
+      run: echo "Starting test execution with coverage"
+
+    - name: Run tests with coverage
+      run: pytest -v -ra --cov=FastThinkNet --cov-report=xml
+
+    - name: Post-run tests logging
+      run: echo "Finished test execution with coverage"
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+
+    - name: Pre-build logging
+      run: echo "Starting package build"
+
+    - name: Build package
+      run: python -m build
+
+    - name: Post-build logging
+      run: echo "Finished package build"
+
+    - name: Pre-check distribution logging
+      run: echo "Starting distribution check"
+
+    - name: Check distribution
+      run: twine check dist/*
+
+    - name: Post-check distribution logging
+      run: echo "Finished distribution check"
+
+    - name: Pre-test package installation logging
+      run: echo "Starting test package installation"
+
+    - name: Test package installation
       run: |
-        python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
-        python -c "import tensorflow as tf; print('GPU available:', tf.test.is_built_with_cuda())"
+        python -m venv test_env
+        source test_env/bin/activate
+        pip install dist/*.whl
+        python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+        deactivate
 
-    - name: Install pytest
-      run: pip install pytest
+    - name: Post-test package installation logging
+      run: echo "Finished test package installation"
 
-    - name: Test with pytest
-      run: pytest -v -ra
+  build-docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    container:
+      image: tensorflow/tensorflow:latest-gpu-jupyter
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Log Python version
+      run: python --version
+
+    - name: Log pip version
+      run: pip --version
+
+    - name: Log TensorFlow version
+      run: python -c "import tensorflow as tf; print(tf.__version__)"
+
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-3.12
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Print Python and pip versions
+      run: |
+        python --version
+        pip --version
+
+    - name: List directory contents
+      run: ls -la
+
+    - name: Install project dependencies
+      timeout-minutes: 60
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+
+    - name: Install linting tools
+      timeout-minutes: 10
+      run: pip install flake8 black mypy
+
+    - name: Install testing tools
+      timeout-minutes: 10
+      run: pip install pytest pytest-cov
+
+    - name: Install build tools
+      timeout-minutes: 10
+      run: pip install build twine
+
+    - name: Install PyTorch
+      timeout-minutes: 15
+      run: pip install torch torchvision
+
+    # NVIDIA CUDA libraries are already included in the TensorFlow GPU image
+    - name: Log CUDA version
+      run: nvcc --version
+
+    - name: Ensure flake8 is installed
+      run: |
+        pip install flake8
+        flake8 --version
+
+    - name: Lint with flake8
+      run: python -m flake8 .
+
+    - name: Print black version
+      run: black --version
+
+    - name: Print black command
+      run: echo "black --check ."
+
+    - name: Check formatting with black
+      run: black --check .
+
+    - name: Type check with mypy
+      run: mypy .
+
+    - name: Test FastThinkNet import
+      run: python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+
+    - name: Run tests with coverage
+      run: pytest -v -ra --cov=FastThinkNet --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+
+    - name: Build package
+      run: python -m build
+
+    - name: Check distribution
+      run: twine check dist/*
+
+    - name: Test package installation
+      run: |
+        python -m venv test_env
+        source test_env/bin/activate
+        pip install dist/*.whl
+        python -c "import FastThinkNet; print(FastThinkNet.__version__)"
+        deactivate
