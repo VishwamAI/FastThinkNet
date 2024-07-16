@@ -73,7 +73,9 @@ class FastThinkNetMeta(nn.Module):
         return clone
 
     def integrate_with_dl_rl(
-        self, dl_model: nn.Module, rl_model: nn.Module
+        self,
+        dl_model: nn.Module,
+        rl_model: nn.Module
     ) -> nn.Module:
         # This method should be implemented to integrate with deep learning
         # and reinforcement learning components
