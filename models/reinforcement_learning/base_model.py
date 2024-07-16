@@ -22,7 +22,8 @@ class FastThinkNetRL:
                 tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
                 tf.keras.layers.Dense(64, activation="relu"),
                 tf.keras.layers.Dense(
-                    output_dim, activation="softmax" if name == "policy" else None
+                    output_dim,
+                    activation="softmax" if name == "policy" else None
                 ),
             ]
         )
