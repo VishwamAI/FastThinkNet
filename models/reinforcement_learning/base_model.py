@@ -18,8 +18,7 @@ class FastThinkNetRL:
         # Value network
         self.value_network = self._build_network(state_dim, 1, "value")
         self.target_value_network = self._build_network(
-            state_dim, 1, "target_value"
-        )
+            state_dim, 1, "target_value")
         self.value_optimizer = tf.keras.optimizers.Adam(
             learning_rate=learning_rate
         )
