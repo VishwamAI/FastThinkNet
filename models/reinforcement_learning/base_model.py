@@ -20,7 +20,7 @@ class FastThinkNetRL:
             state_dim, 1, "target_value"
         )
         self.value_optimizer = tf.keras.optimizers.Adam(
-            learning_rate=learning_rate,
+            learning_rate=learning_rate
         )
 
         # PPO hyperparameters
