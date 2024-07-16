@@ -45,7 +45,14 @@ class NeuralNetworkAgent:
         initial_state = np.expand_dims(initial_state, axis=0)
         next_state = np.expand_dims(next_state, axis=0)
         gamma = 0.99  # Consider making this a class attribute or parameter
-        self.update(self.model, initial_state, next_state, [reward], [action], gamma)
+        self.update(
+            self.model,
+            initial_state,
+            next_state,
+            [reward],
+            [action],
+            gamma
+        )
 
     def train(
         self,
@@ -105,8 +112,8 @@ class NeuralNetworkAgent:
 
             if episode % 100 == 0:
                 print(
-                    f"Episode: {episode}, Avg Reward: "
-                    f"{np.mean(episode_rewards[-100:]):.2f}, "
+                    f"Episode: {episode}, "
+                    f"Avg Reward: {np.mean(episode_rewards[-100:]):.2f}, "
                     f"Epsilon: {epsilon:.2f}"
                 )
 
