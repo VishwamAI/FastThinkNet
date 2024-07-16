@@ -5,12 +5,15 @@ import torch.optim as optim
 import random
 from typing import List, Tuple
 
+
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding="same")
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3,
+                               stride=1, padding="same")
         self.bn1 = nn.BatchNorm2d(out_channels)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding="same")
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3,
+                               stride=1, padding="same")
         self.bn2 = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
@@ -19,6 +22,7 @@ class ResidualBlock(nn.Module):
         out = self.bn2(self.conv2(out))
         out += residual
         return F.relu(out)
+
 
 class FastThinkNetSelfPlay(nn.Module):
     def __init__(self, input_shape=(64, 64, 3), output_size=5):
@@ -36,7 +40,9 @@ class FastThinkNetSelfPlay(nn.Module):
             nn.Linear(128, output_size),
         )
         self.optimizer = optim.Adam(self.parameters(), lr=0.001)
-        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, patience=10, factor=0.5)
+        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer, patience=10, factor=0.5
+        )
         self.past_versions: List[nn.Module] = []
         self.epsilon = 1.0  # Initial epsilon value for epsilon-greedy strategy
 
