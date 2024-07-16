@@ -68,7 +68,10 @@ class FastThinkNetRL:
             policy_loss = -tf.reduce_mean(
                 tf.minimum(ratio * advantages, clipped_ratio * advantages)
             )
-            entropy = -tf.reduce_sum(action_probs * tf.math.log(action_probs + 1e-8), axis=1)
+            entropy = -tf.reduce_sum(
+                action_probs * tf.math.log(action_probs + 1e-8),
+                axis=1
+            )
             loss = policy_loss - self.entropy_coef * tf.reduce_mean(entropy)
 
         grads = tape.gradient(loss, self.policy_network.trainable_variables)
