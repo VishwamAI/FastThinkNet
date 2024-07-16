@@ -16,7 +16,13 @@ class FastThinkNetRL:
 
         # Value network
         self.value_network = self._build_network(state_dim, 1, "value")
+        self.target_value_network = self._build_network(state_dim, 1, "target_value")
         self.value_optimizer = tf.keras.optimizers.Adam(learning_rate)
+
+        # PPO hyperparameters
+        self.epsilon = 0.2
+        self.value_coef = 0.5
+        self.entropy_coef = 0.01
 
     def _build_network(self, input_dim, output_dim, name):
         model = tf.keras.Sequential([
@@ -51,14 +57,19 @@ class FastThinkNetRL:
         return experiences
 
     @tf.function
-    def update_policy(self, states, actions, advantages):
+    def update_policy(self, states, actions, old_probs, advantages):
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
             selected_action_probs = tf.reduce_sum(
                 action_probs * tf.one_hot(actions, self.action_dim), axis=1
             )
-            log_probs = tf.math.log(selected_action_probs)
-            loss = -tf.reduce_mean(log_probs * advantages)
+            ratio = selected_action_probs / old_probs
+            clipped_ratio = tf.clip_by_value(ratio, 1 - self.epsilon, 1 + self.epsilon)
+            policy_loss = -tf.reduce_mean(
+                tf.minimum(ratio * advantages, clipped_ratio * advantages)
+            )
+            entropy = -tf.reduce_sum(action_probs * tf.math.log(action_probs + 1e-8), axis=1)
+            loss = policy_loss - self.entropy_coef * tf.reduce_mean(entropy)
 
         grads = tape.gradient(loss, self.policy_network.trainable_variables)
         self.policy_optimizer.apply_gradients(

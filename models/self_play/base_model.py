@@ -1,24 +1,32 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import random
 from typing import List, Tuple
 
+class ResidualBlock(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding="same")
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding="same")
+        self.bn2 = nn.BatchNorm2d(out_channels)
+
+    def forward(self, x):
+        residual = x
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += residual
+        return F.relu(out)
 
 class FastThinkNetSelfPlay(nn.Module):
     def __init__(self, input_shape=(64, 64, 3), output_size=5):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Conv2d(input_shape[2], 32, kernel_size=3, stride=1,
-                      padding="same"),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
-            nn.Dropout(0.2),
+            ResidualBlock(input_shape[2], 32),
             nn.MaxPool2d(2, 2),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding="same"),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.Dropout(0.2),
+            ResidualBlock(32, 64),
             nn.MaxPool2d(2, 2),
             nn.Flatten(),
             nn.Linear(self._get_conv_output(input_shape), 128),
@@ -28,7 +36,9 @@ class FastThinkNetSelfPlay(nn.Module):
             nn.Linear(128, output_size),
         )
         self.optimizer = optim.Adam(self.parameters(), lr=0.001)
+        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, patience=10, factor=0.5)
         self.past_versions: List[nn.Module] = []
+        self.epsilon = 1.0  # Initial epsilon value for epsilon-greedy strategy
 
     def _get_conv_output(self, shape):
         batch_size = 1
@@ -47,8 +57,9 @@ class FastThinkNetSelfPlay(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
 
-    def act(self, state: torch.Tensor, epsilon: float = 0.1) -> int:
-        if random.random() < epsilon:
+    def act(self, state: torch.Tensor) -> int:
+        self.epsilon = max(0.01, self.epsilon * 0.995)  # Decay epsilon
+        if random.random() < self.epsilon:
             return random.randint(0, self.model[-1].out_features - 1)
         else:
             with torch.no_grad():
@@ -100,6 +111,7 @@ class FastThinkNetSelfPlay(nn.Module):
         torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=1.0)
 
         self.optimizer.step()
+        self.scheduler.step(loss)  # Update learning rate based on loss
 
     def curriculum_learning(
         self,
