@@ -20,7 +20,8 @@ class FastThinkNetRL:
 
     def _build_network(self, input_dim, output_dim, name):
         model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+            tf.keras.layers.Dense(64, activation="relu",
+                                  input_shape=(input_dim,)),
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(
                 output_dim,
@@ -53,7 +54,8 @@ class FastThinkNetRL:
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
             selected_action_probs = tf.reduce_sum(
-                action_probs * tf.one_hot(actions, self.action_dim), axis=1
+                action_probs * tf.one_hot(actions, self.action_dim),
+                axis=1
             )
             log_probs = tf.math.log(selected_action_probs)
             loss = -tf.reduce_mean(log_probs * advantages)
