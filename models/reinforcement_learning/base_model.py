@@ -9,7 +9,8 @@ class FastThinkNetRL:
         self.learning_rate = learning_rate
 
         # Policy network
-        self.policy_network = self._build_network(state_dim, action_dim, "policy")
+        self.policy_network = self._build_network(
+            state_dim, action_dim, "policy")
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # Value network
@@ -44,7 +45,8 @@ class FastThinkNetRL:
             while not done:
                 action = self.choose_action(state)
                 next_state, reward, done, _ = env.step(action)
-                episode_experience.append((state, action, reward, next_state, done))
+                episode_experience.append((state, action, reward,
+                                           next_state, done))
                 state = next_state
             experiences.extend(episode_experience)
         return experiences
@@ -69,7 +71,7 @@ class FastThinkNetRL:
     def update_value_function(self, states, returns):
         with tf.GradientTape() as tape:
             predicted_values = self.value_network(states)
-            loss = tf.keras.losses.mean_squared_error(returns, predicted_values)
+            loss = tf.keras.losses.MSE(returns, predicted_values)
 
         grads = tape.gradient(loss, self.value_network.trainable_variables)
         self.value_optimizer.apply_gradients(
