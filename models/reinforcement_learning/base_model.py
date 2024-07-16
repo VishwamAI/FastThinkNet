@@ -1,4 +1,6 @@
 import tensorflow as tf
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.models import Model
 import numpy as np
 
 
@@ -17,16 +19,14 @@ class FastThinkNetRL:
         self.value_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
     def _build_network(self, input_dim, output_dim, name):
-        model = tf.keras.Sequential(
-            [
-                tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
-                tf.keras.layers.Dense(64, activation="relu"),
-                tf.keras.layers.Dense(
-                    output_dim,
-                    activation="softmax" if name == "policy" else None
-                ),
-            ]
-        )
+        model = tf.keras.Sequential([
+            tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+            tf.keras.layers.Dense(64, activation="relu"),
+            tf.keras.layers.Dense(
+                output_dim,
+                activation="softmax" if name == "policy" else None
+            ),
+        ])
         return model
 
     def choose_action(self, state):
@@ -95,7 +95,9 @@ class FastThinkNetRL:
 
             # Update policy and value function
             policy_loss = self.update_policy(states, actions, advantages)
-            value_loss = self.update_value_function(states, returns)
+            value_loss = self.update_value_function(
+                states, returns
+            )
 
             if episode % 10 == 0:
                 print(

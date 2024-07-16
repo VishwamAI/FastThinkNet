@@ -119,7 +119,8 @@ class NeuralNetworkAgent:
 
         return episode_rewards
 
-    def update(self, target_model, states, next_states, rewards, actions, gamma):
+    def update(self, target_model, states, next_states, rewards, actions,
+               gamma):
         q_values = self.model.predict(states)
         next_q_values = target_model.predict(next_states)
 
