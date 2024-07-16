@@ -44,7 +44,8 @@ class FastThinkNetRL:
             while not done:
                 action = self.choose_action(state)
                 next_state, reward, done, _ = env.step(action)
-                episode_experience.append((state, action, reward, next_state, done))
+                episode_experience.append((state, action, reward,
+                                           next_state, done))
                 state = next_state
             experiences.extend(episode_experience)
         return experiences
