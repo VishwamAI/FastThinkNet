@@ -105,9 +105,11 @@ jobs:
 
     - name: Ensure flake8 is installed and up-to-date
       run: |
-        pip install flake8==4.0.1
+        pip install --upgrade flake8
         flake8 --version
 
+    - name: Display content of base_model.py
+      run: cat ./models/reinforcement_learning/base_model.py
 
     - name: Lint with flake8
       run: python -m flake8 .
