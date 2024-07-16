@@ -1,6 +1,4 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Input
-from tensorflow.keras.models import Model
 import numpy as np
 
 
@@ -95,9 +93,7 @@ class FastThinkNetRL:
 
             # Update policy and value function
             policy_loss = self.update_policy(states, actions, advantages)
-            value_loss = self.update_value_function(
-                states, returns
-            )
+            value_loss = self.update_value_function(states, returns)
 
             if episode % 10 == 0:
                 print(
