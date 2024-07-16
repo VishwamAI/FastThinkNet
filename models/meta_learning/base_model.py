@@ -51,7 +51,8 @@ class FastThinkNetMeta(nn.Module):
             x_query, y_query = task
 
             task_model = self.inner_loop((x_support, y_support), num_inner_steps)
-            task_loss = nn.functional.mse_loss(task_model(x_query), y_query)
+            predictions = task_model(x_query)
+            task_loss = nn.functional.mse_loss(predictions, y_query)
             meta_loss += task_loss
 
         self.meta_optimizer.zero_grad()
