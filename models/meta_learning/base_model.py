@@ -103,7 +103,8 @@ predictions = meta_learner.few_shot_learning(support_set, query_set)
 
 # Outer loop training
 tasks = [
-    (torch.randn(5, 10), torch.randn(5, 1))
+    ((torch.randn(5, 10), torch.randn(5, 1)),
+     (torch.randn(5, 10), torch.randn(5, 1)))
     for _ in range(10)
 ]
 meta_learner.outer_loop(tasks)
