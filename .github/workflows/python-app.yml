@@ -105,7 +105,7 @@ jobs:
 
     - name: Ensure flake8 is installed and up-to-date
       run: |
-        pip install --upgrade flake8
+        pip install flake8==4.0.1
         flake8 --version
 
 
