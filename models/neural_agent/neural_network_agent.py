@@ -53,7 +53,6 @@ class NeuralNetworkAgent(BaseAgent):
     def train(self, states, actions, rewards, next_states, dones):
         target_q_values = self.target_model.predict(next_states)
         max_target_q_values = np.max(target_q_values, axis=1)
-        target_q_values = rewards + self.gamma * max_target_q_values * (1 - dones)
         target_q_values = (
             rewards + self.gamma * max_target_q_values * (1 - dones)
         )

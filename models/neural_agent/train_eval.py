@@ -26,8 +26,13 @@ def parse_args():
 def train(model, train_data, train_labels, epochs, batch_size):
     for epoch in range(epochs):
         print(f"Epoch {epoch + 1}/{epochs}")
-        model.fit(train_data, train_labels, epochs=1, batch_size=batch_size, verbose=1)
-
+        model.fit(
+            train_data,
+            train_labels,
+            epochs=1,
+            batch_size=batch_size,
+            verbose=1
+        )
 
 def evaluate(model, test_data, test_labels):
     loss, accuracy = model.evaluate(test_data, test_labels, verbose=0)
