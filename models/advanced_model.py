@@ -7,10 +7,35 @@ import logging
 import shap
 import lime
 import lime.lime_image
+from contextlib import contextmanager
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Custom exceptions
+class InputShapeError(ValueError):
+    pass
+
+class ConvolutionError(RuntimeError):
+    pass
+
+class LSTMError(RuntimeError):
+    pass
+
+class AttentionError(RuntimeError):
+    pass
+
+class FCLayerError(RuntimeError):
+    pass
+
+@contextmanager
+def error_handling_context(section_name):
+    try:
+        yield
+    except Exception as e:
+        logger.error(f"Error in {section_name}: {str(e)}")
+        raise
 
 class AdvancedFastThinkNet(nn.Module):
     def __init__(
@@ -24,6 +49,7 @@ class AdvancedFastThinkNet(nn.Module):
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.output_dim = output_dim
+        self.debug_mode = False
 
         # Convolutional layers for image processing
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
@@ -45,15 +71,19 @@ class AdvancedFastThinkNet(nn.Module):
         # Dropout for regularization
         self.dropout = nn.Dropout(0.5)
 
+    def set_debug_mode(self, mode: bool):
+        self.debug_mode = mode
+
     def forward(self, x):
         try:
             # Input validation
             if not isinstance(x, torch.Tensor):
-                raise ValueError("Input must be a torch.Tensor")
+                raise InputShapeError("Input must be a torch.Tensor")
             if x.dim() not in [2, 4]:
-                raise ValueError(f"Expected input to be 2D or 4D, but got {x.dim()}D")
+                raise InputShapeError(f"Expected input to be 2D or 4D, but got {x.dim()}D")
 
-            logger.info(f"Input shape: {x.shape}")
+            if self.debug_mode:
+                logger.debug(f"Input shape: {x.shape}")
 
             # Reshape input if necessary
             if x.dim() == 2:
@@ -68,79 +98,75 @@ class AdvancedFastThinkNet(nn.Module):
             self.activations = {}
 
             # Convolutional layers
-            try:
+            with error_handling_context("convolutional layers"):
                 x = F.relu(self.conv1(x))
                 self.activations['conv1'] = x
                 x = F.max_pool2d(x, 2)
                 x = F.relu(self.conv2(x))
                 self.activations['conv2'] = x
                 x = F.max_pool2d(x, 2)
-                logger.info(f"After conv layers shape: {x.shape}")
-            except RuntimeError as e:
-                logger.error(f"Error in convolutional layers: {str(e)}")
-                raise
+                if self.debug_mode:
+                    logger.debug(f"After conv layers shape: {x.shape}")
 
             # Reshape for LSTM
-            try:
+            with error_handling_context("reshaping for LSTM"):
                 x = x.view(x.size(0), -1, 64)
-                logger.info(f"Reshaped for LSTM shape: {x.shape}")
-            except RuntimeError as e:
-                logger.error(f"Error reshaping for LSTM: {str(e)}")
-                raise
+                if self.debug_mode:
+                    logger.debug(f"Reshaped for LSTM shape: {x.shape}")
 
             # LSTM layer
-            try:
+            with error_handling_context("LSTM layer"):
                 x, _ = self.lstm(x)
                 self.activations['lstm'] = x
-                logger.info(f"After LSTM shape: {x.shape}")
-            except RuntimeError as e:
-                logger.error(f"Error in LSTM layer: {str(e)}")
-                raise
+                if self.debug_mode:
+                    logger.debug(f"After LSTM shape: {x.shape}")
 
             # Attention mechanism
-            try:
+            with error_handling_context("attention mechanism"):
                 x = x.permute(1, 0, 2)  # Change to (seq_len, batch, features)
                 x = self.attention(x)
                 x = x.permute(1, 0, 2)  # Change back to (batch, seq_len, features)
                 self.activations['attention'] = x
-                logger.info(f"After attention shape: {x.shape}")
-            except RuntimeError as e:
-                logger.error(f"Error in attention mechanism: {str(e)}")
-                raise
+                if self.debug_mode:
+                    logger.debug(f"After attention shape: {x.shape}")
 
             # Take the last output of the sequence
             x = x[:, -1, :]
 
             # Fully connected layers
-            try:
+            with error_handling_context("fully connected layers"):
                 x = F.relu(self.fc1(x))
                 self.activations['fc1'] = x
                 x = self.dropout(x)
                 x = self.fc2(x)
                 self.activations['fc2'] = x
-                logger.info(f"Final output shape: {x.shape}")
-            except RuntimeError as e:
-                logger.error(f"Error in fully connected layers: {str(e)}")
-                raise
+                if self.debug_mode:
+                    logger.debug(f"Final output shape: {x.shape}")
 
             return F.log_softmax(x, dim=1)
 
         except torch.cuda.OutOfMemoryError as e:
-            logger.critical(f"CUDA out of memory: {str(e)}")
-            # Implement a fallback mechanism or raise a custom exception
-            raise
-        except ValueError as e:
-            logger.error(f"Invalid input: {str(e)}")
+            logger.critical(f"CUDA out of memory: {str(e)}. Falling back to CPU.")
+            self.to('cpu')
+            x = x.to('cpu')
+            return self.forward(x)  # Recursive call with CPU tensors
+        except InputShapeError as e:
+            logger.error(f"Invalid input shape: {str(e)}")
             raise
         except Exception as e:
             logger.error(f"Unexpected error in forward pass: {str(e)}")
             raise
 
     def curriculum_learning(self, epoch, max_epochs):
-        # Implement curriculum learning strategy
-        difficulty = min(1.0, epoch / max_epochs)
-        self.dropout.p = 0.5 * difficulty
-        logger.info(f"Curriculum learning: Set dropout to {self.dropout.p}")
+        try:
+            # Implement curriculum learning strategy
+            difficulty = min(1.0, epoch / max_epochs)
+            self.dropout.p = 0.5 * difficulty
+            if self.debug_mode:
+                logger.debug(f"Curriculum learning: Set dropout to {self.dropout.p}")
+        except Exception as e:
+            logger.error(f"Error in curriculum learning: {str(e)}")
+            raise
 
     def analyze_feature_importance(self, X, y, method='shap', num_samples=100):
         """
@@ -155,28 +181,41 @@ class AdvancedFastThinkNet(nn.Module):
         Returns:
         dict: Feature importance scores
         """
-        if method == 'shap':
-            explainer = shap.DeepExplainer(self, X[:num_samples])
-            shap_values = explainer.shap_values(X[:num_samples])
-            return {'shap_values': shap_values}
-        elif method == 'lime':
-            explainer = lime.lime_image.LimeImageExplainer()
-            explanation = explainer.explain_instance(X[0].numpy(),
-                                                     self.predict_proba,
-                                                     top_labels=5,
-                                                     hide_color=0,
-                                                     num_samples=num_samples)
-            return {'lime_explanation': explanation}
-        else:
-            raise ValueError("Method must be either 'shap' or 'lime'")
+        try:
+            if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
+                raise ValueError("X and y must be torch.Tensor objects")
+            if X.shape[0] != y.shape[0]:
+                raise ValueError(f"X and y must have the same number of samples. Got X: {X.shape[0]}, y: {y.shape[0]}")
+
+            if method == 'shap':
+                explainer = shap.DeepExplainer(self, X[:num_samples])
+                shap_values = explainer.shap_values(X[:num_samples])
+                return {'shap_values': shap_values}
+            elif method == 'lime':
+                explainer = lime.lime_image.LimeImageExplainer()
+                explanation = explainer.explain_instance(X[0].numpy(),
+                                                         self.predict_proba,
+                                                         top_labels=5,
+                                                         hide_color=0,
+                                                         num_samples=num_samples)
+                return {'lime_explanation': explanation}
+            else:
+                raise ValueError("Method must be either 'shap' or 'lime'")
+        except Exception as e:
+            logger.error(f"Error in feature importance analysis: {str(e)}")
+            raise
 
     def predict_proba(self, input_data):
         """
         Helper method for LIME to get class probabilities.
         """
-        with torch.no_grad():
-            output = self(torch.from_numpy(input_data).float())
-        return output.numpy()
+        try:
+            with torch.no_grad():
+                output = self(torch.from_numpy(input_data).float())
+            return output.numpy()
+        except Exception as e:
+            logger.error(f"Error in predict_proba: {str(e)}")
+            raise
 
 
 # Instantiate the advanced model
