@@ -40,6 +40,7 @@ class AttentionError(RuntimeError):
 class FCLayerError(RuntimeError):
     pass
 
+
 @contextmanager
 def error_handling_context(section_name):
     try:
@@ -47,6 +48,7 @@ def error_handling_context(section_name):
     except Exception as e:
         logger.error(f"Error in {section_name}: {str(e)}")
         raise
+
 
 class AdvancedFastThinkNet(nn.Module):
     def __init__(
@@ -138,7 +140,9 @@ class AdvancedFastThinkNet(nn.Module):
             with error_handling_context("attention mechanism"):
                 x = x.permute(1, 0, 2)  # Change to (seq_len, batch, features)
                 x = self.attention(x)
-                x = x.permute(1, 0, 2)  # Change back to (batch, seq_len, features)
+                x = x.permute(
+                    1, 0, 2
+                )  # Change back to (batch, seq_len, features)
                 self.activations['attention'] = x
                 if self.debug_mode:
                     logger.debug(f"After attention shape: {x.shape}")
@@ -203,7 +207,7 @@ class AdvancedFastThinkNet(nn.Module):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
                 raise ValueError(
-                    f"X and y must have the same number of samples. "
+                    "X and y must have the same number of samples. "
                     f"Got X: {X.shape[0]}, y: {y.shape[0]}"
                 )
 
