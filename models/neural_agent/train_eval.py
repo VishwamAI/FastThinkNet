@@ -26,8 +26,7 @@ def parse_args():
 def train(model, train_data, train_labels, epochs, batch_size):
     for epoch in range(epochs):
         print(f"Epoch {epoch + 1}/{epochs}")
-        model.fit(train_data, train_labels, epochs=1, batch_size=batch_size,
-                  verbose=1)
+        model.fit(train_data, train_labels, epochs=1, batch_size=batch_size, verbose=1)
 
 
 def evaluate(model, test_data, test_labels):
@@ -49,8 +48,8 @@ def main():
     model = NeuralNetworkAgent(input_shape=(10,), num_classes=1)
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=args.learning_rate),
-        loss='binary_crossentropy',
-        metrics=['accuracy']
+        loss="binary_crossentropy",
+        metrics=["accuracy"],
     )
 
     # Train the model

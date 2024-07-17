@@ -9,13 +9,16 @@ class NeuralNetworkAgent:
         self.model = self.create_model()
 
     def create_model(self):
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation='relu',
-                                  input_shape=self.input_shape),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(self.num_actions, activation='linear')
-        ])
-        model.compile(optimizer='adam', loss='mse')
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Dense(
+                    64, activation="relu", input_shape=self.input_shape
+                ),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(self.num_actions, activation="linear"),
+            ]
+        )
+        model.compile(optimizer="adam", loss="mse")
         return model
 
     def get_action(self, state):

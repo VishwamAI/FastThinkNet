@@ -9,11 +9,13 @@ from typing import List, Tuple
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3,
-                               stride=1, padding="same")
+        self.conv1 = nn.Conv2d(
+            in_channels, out_channels, kernel_size=3, stride=1, padding="same"
+        )
         self.bn1 = nn.BatchNorm2d(out_channels)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3,
-                               stride=1, padding="same")
+        self.conv2 = nn.Conv2d(
+            out_channels, out_channels, kernel_size=3, stride=1, padding="same"
+        )
         self.bn2 = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
@@ -85,9 +87,7 @@ class FastThinkNetSelfPlay(nn.Module):
             next_state, reward, done, _ = env.step(action)
             next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0)
 
-            experiences.append((
-                state_tensor, action, reward, next_state_tensor, done
-            ))
+            experiences.append((state_tensor, action, reward, next_state_tensor, done))
             state = next_state
 
         return experiences
@@ -178,9 +178,7 @@ class FastThinkNetSelfPlay(nn.Module):
             ].weight.data.clone()
 
             # Transfer policy from RL model
-            self.model[-1].weight.data = (
-                rl_model.policy_net[-1].weight.data.clone()
-            )
+            self.model[-1].weight.data = rl_model.policy_net[-1].weight.data.clone()
 
         self.transfer_knowledge = transfer_knowledge
 

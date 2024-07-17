@@ -4,9 +4,16 @@ from fastthinknet.base import BaseAgent
 
 
 class NeuralNetworkAgent(BaseAgent):
-    def __init__(self, input_shape=(64, 64, 3), action_space=4,
-                 learning_rate=0.001, gamma=0.99, epsilon=1.0,
-                 epsilon_decay=0.995, epsilon_min=0.01):
+    def __init__(
+        self,
+        input_shape=(64, 64, 3),
+        action_space=4,
+        learning_rate=0.001,
+        gamma=0.99,
+        epsilon=1.0,
+        epsilon_decay=0.995,
+        epsilon_min=0.01,
+    ):
         super().__init__()
         self.input_shape = input_shape
         self.action_space = action_space
@@ -20,16 +27,21 @@ class NeuralNetworkAgent(BaseAgent):
         self.target_model.set_weights(self.model.get_weights())
 
     def create_model(self):
-        model = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(32, (3, 3), activation='relu',
-                                   input_shape=self.input_shape),
-            tf.keras.layers.MaxPooling2D((2, 2)),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(self.action_space, activation='linear')
-        ])
-        model.compile(optimizer=tf.keras.optimizers.Adam(
-            learning_rate=self.learning_rate), loss='mse')
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Conv2D(
+                    32, (3, 3), activation="relu", input_shape=self.input_shape
+                ),
+                tf.keras.layers.MaxPooling2D((2, 2)),
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(self.action_space, activation="linear"),
+            ]
+        )
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
+            loss="mse",
+        )
         return model
 
     def get_action(self, state):
@@ -41,8 +53,7 @@ class NeuralNetworkAgent(BaseAgent):
     def train(self, states, actions, rewards, next_states, dones):
         target_q_values = self.target_model.predict(next_states)
         max_target_q_values = np.max(target_q_values, axis=1)
-        target_q_values = (rewards +
-                           self.gamma * max_target_q_values * (1 - dones))
+        target_q_values = rewards + self.gamma * max_target_q_values * (1 - dones)
 
         q_values = self.model.predict(states)
         q_values[np.arange(q_values.shape[0]), actions] = target_q_values

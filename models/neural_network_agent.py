@@ -117,8 +117,8 @@ class NeuralNetworkAgent:
             if dones[i]:
                 target_q_values[i][actions[i]] = rewards[i]
             else:
-                target_q_values[i][actions[i]] = (
-                    rewards[i] + self.gamma * np.max(next_q_values[i])
+                target_q_values[i][actions[i]] = rewards[i] + self.gamma * np.max(
+                    next_q_values[i]
                 )
 
         self.model.fit(states, target_q_values, verbose=0)
