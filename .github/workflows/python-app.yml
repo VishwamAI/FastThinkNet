@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
 
     strategy:
       matrix:
@@ -54,23 +54,14 @@ jobs:
     - name: Post-install project dependencies logging
       run: echo "Finished installation of project dependencies"
 
-    - name: Pre-install development dependencies logging
-      run: echo "Starting installation of development dependencies"
-
-    - name: Install linting tools
-      timeout-minutes: 10
-      run: pip install flake8 black mypy
-
-    - name: Install testing tools
-      timeout-minutes: 10
-      run: pip install pytest pytest-cov
-
-    - name: Install build tools
-      timeout-minutes: 10
-      run: pip install build twine
-
-    - name: Post-install development dependencies logging
-      run: echo "Finished installation of development dependencies"
+    - name: Install development dependencies
+      timeout-minutes: 20
+      run: |
+        echo "Starting installation of development dependencies"
+        pip install flake8 black mypy
+        pip install pytest pytest-cov
+        pip install build twine
+        echo "Finished installation of development dependencies"
 
     - name: Pre-install ML frameworks logging
       run: echo "Starting installation of ML frameworks"
