@@ -45,6 +45,14 @@ class AdvancedFastThinkNet(nn.Module):
 
     def forward(self, x):
         try:
+            # Input validation
+            if not isinstance(x, torch.Tensor):
+                raise ValueError("Input must be a torch.Tensor")
+            if x.dim() not in [2, 4]:
+                raise ValueError(f"Expected input to be 2D or 4D, but got {x.dim()}D")
+
+            logger.info(f"Input shape: {x.shape}")
+
             # Reshape input if necessary
             if x.dim() == 2:
                 x = x.view(
@@ -55,34 +63,66 @@ class AdvancedFastThinkNet(nn.Module):
                 )
 
             # Convolutional layers
-            x = F.relu(self.conv1(x))
-            x = F.max_pool2d(x, 2)
-            x = F.relu(self.conv2(x))
-            x = F.max_pool2d(x, 2)
+            try:
+                x = F.relu(self.conv1(x))
+                x = F.max_pool2d(x, 2)
+                x = F.relu(self.conv2(x))
+                x = F.max_pool2d(x, 2)
+                logger.info(f"After conv layers shape: {x.shape}")
+            except RuntimeError as e:
+                logger.error(f"Error in convolutional layers: {str(e)}")
+                raise
 
             # Reshape for LSTM
-            x = x.view(x.size(0), -1, 64)
+            try:
+                x = x.view(x.size(0), -1, 64)
+                logger.info(f"Reshaped for LSTM shape: {x.shape}")
+            except RuntimeError as e:
+                logger.error(f"Error reshaping for LSTM: {str(e)}")
+                raise
 
             # LSTM layer
-            x, _ = self.lstm(x)
+            try:
+                x, _ = self.lstm(x)
+                logger.info(f"After LSTM shape: {x.shape}")
+            except RuntimeError as e:
+                logger.error(f"Error in LSTM layer: {str(e)}")
+                raise
 
             # Attention mechanism
-            x = x.permute(1, 0, 2)  # Change to (seq_len, batch, features)
-            x = self.attention(x)
-            x = x.permute(1, 0, 2)  # Change back to (batch, seq_len, features)
+            try:
+                x = x.permute(1, 0, 2)  # Change to (seq_len, batch, features)
+                x = self.attention(x)
+                x = x.permute(1, 0, 2)  # Change back to (batch, seq_len, features)
+                logger.info(f"After attention shape: {x.shape}")
+            except RuntimeError as e:
+                logger.error(f"Error in attention mechanism: {str(e)}")
+                raise
 
             # Take the last output of the sequence
             x = x[:, -1, :]
 
             # Fully connected layers
-            x = F.relu(self.fc1(x))
-            x = self.dropout(x)
-            x = self.fc2(x)
+            try:
+                x = F.relu(self.fc1(x))
+                x = self.dropout(x)
+                x = self.fc2(x)
+                logger.info(f"Final output shape: {x.shape}")
+            except RuntimeError as e:
+                logger.error(f"Error in fully connected layers: {str(e)}")
+                raise
 
             return F.log_softmax(x, dim=1)
 
+        except torch.cuda.OutOfMemoryError as e:
+            logger.critical(f"CUDA out of memory: {str(e)}")
+            # Implement a fallback mechanism or raise a custom exception
+            raise
+        except ValueError as e:
+            logger.error(f"Invalid input: {str(e)}")
+            raise
         except Exception as e:
-            logger.error(f"Error in forward pass: {str(e)}")
+            logger.error(f"Unexpected error in forward pass: {str(e)}")
             raise
 
     def curriculum_learning(self, epoch, max_epochs):
