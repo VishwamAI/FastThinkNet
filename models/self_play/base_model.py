@@ -10,11 +10,13 @@ class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
         self.conv1 = nn.Conv2d(
-            in_channels, out_channels, kernel_size=3, stride=1, padding="same"
+            in_channels, out_channels, kernel_size=3,
+            stride=1, padding="same"
         )
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.conv2 = nn.Conv2d(
-            out_channels, out_channels, kernel_size=3, stride=1, padding="same"
+            out_channels, out_channels, kernel_size=3,
+            stride=1, padding="same"
         )
         self.bn2 = nn.BatchNorm2d(out_channels)
 
@@ -41,7 +43,9 @@ class FastThinkNetSelfPlay(nn.Module):
             nn.Dropout(0.3),
             nn.Linear(128, output_size),
         )
-        self.optimizer = optim.Adam(self.parameters(), lr=0.001)
+        self.optimizer = optim.Adam(
+            self.parameters(), lr=0.001
+        )
         self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             self.optimizer, patience=10, factor=0.5
         )
@@ -50,7 +54,9 @@ class FastThinkNetSelfPlay(nn.Module):
 
     def _get_conv_output(self, shape):
         batch_size = 1
-        input_tensor = torch.autograd.Variable(torch.rand(batch_size, *shape))
+        input_tensor = torch.autograd.Variable(
+            torch.rand(batch_size, *shape)
+        )
         output_feat = self._forward_conv(input_tensor)
         n_size = output_feat.data.view(batch_size, -1).size(1)
         return n_size
@@ -87,7 +93,9 @@ class FastThinkNetSelfPlay(nn.Module):
             next_state, reward, done, _ = env.step(action)
             next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0)
 
-            experiences.append((state_tensor, action, reward, next_state_tensor, done))
+            experiences.append((
+                state_tensor, action, reward, next_state_tensor, done
+            ))
             state = next_state
 
         return experiences
@@ -109,7 +117,10 @@ class FastThinkNetSelfPlay(nn.Module):
         next_q_values = self.forward(next_states).max(1)[0]
         target_q_values = rewards + (1 - dones.float()) * 0.99 * next_q_values
 
-        loss = nn.MSELoss()(current_q_values, target_q_values.unsqueeze(1))
+        loss = nn.MSELoss()(
+            current_q_values,
+            target_q_values.unsqueeze(1)
+        )
         self.optimizer.zero_grad()
         loss.backward()
 
@@ -173,12 +184,14 @@ class FastThinkNetSelfPlay(nn.Module):
         # Implement knowledge transfer
         def transfer_knowledge():
             # Transfer learned features from deep learning model
-            self.model[0].weight.data = deep_learning_model.feature_extractor[
-                0
-            ].weight.data.clone()
+            self.model[0].weight.data = (
+                deep_learning_model.feature_extractor[0].weight.data.clone()
+            )
 
             # Transfer policy from RL model
-            self.model[-1].weight.data = rl_model.policy_net[-1].weight.data.clone()
+            self.model[-1].weight.data = (
+                rl_model.policy_net[-1].weight.data.clone()
+            )
 
         self.transfer_knowledge = transfer_knowledge
 
