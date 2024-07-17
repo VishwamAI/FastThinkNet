@@ -9,14 +9,20 @@ class FastThinkNetRL:
         self.learning_rate = learning_rate
 
         # Policy network
-        self.policy_network = self._build_network(state_dim, action_dim, "policy")
+        self.policy_network = self._build_network(
+            state_dim, action_dim, "policy"
+        )
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # Value network
         self.value_network = self._build_network(state_dim, 1, "value")
-        self.target_value_network = self._build_network(state_dim, 1, "target_value")
+        self.target_value_network = self._build_network(
+            state_dim, 1, "target_value"
+        )
         # Optimizer for the value network
-        self.value_optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+        self.value_optimizer = tf.keras.optimizers.Adam(
+            learning_rate=learning_rate
+        )
 
         # PPO hyperparameters
         self.epsilon = 0.2
@@ -48,7 +54,9 @@ class FastThinkNetRL:
             while not done:
                 action = self.choose_action(state)
                 next_state, reward, done, _ = env.step(action)
-                episode_experience.append((state, action, reward, next_state, done))
+                episode_experience.append(
+                    (state, action, reward, next_state, done)
+                )
                 state = next_state
             experiences.extend(episode_experience)
         return experiences

@@ -180,7 +180,9 @@ class FastThinkNetSelfPlay(nn.Module):
             ].weight.data.clone()
 
             # Transfer policy from RL model
-            self.model[-1].weight.data = rl_model.policy_net[-1].weight.data.clone()
+            self.model[-1].weight.data = (
+                rl_model.policy_net[-1].weight.data.clone()
+            )
 
         self.transfer_knowledge = transfer_knowledge
 
