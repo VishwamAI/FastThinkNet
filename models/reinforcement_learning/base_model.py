@@ -33,7 +33,8 @@ class FastThinkNetRL:
 
     def _build_network(self, input_dim, output_dim, name):
         model = tf.keras.Sequential([
-            tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+            tf.keras.layers.Dense(64, activation="relu",
+                                  input_shape=(input_dim,)),
             tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dense(
                 output_dim,
@@ -146,9 +147,4 @@ class FastThinkNetRL:
 # action_dim = env.action_space.n
 # rl_model = FastThinkNetRL(state_dim, action_dim)
 # rl_model.train(env, num_episodes=1000)
-
-# Dummy comment to trigger CI/CD run
-# New line to trigger git change detection
-# Trivial change to trigger git detection
-# Dummy comment to ensure git recognizes the changes
 
