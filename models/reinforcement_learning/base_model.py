@@ -20,9 +20,7 @@ class FastThinkNetRL:
         self.target_value_network = self._build_network(
             state_dim, 1, "target_value"
         )
-        self.value_optimizer = tf.keras.optimizers.Adam(
-            learning_rate=learning_rate
-        )
+        self.value_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # PPO hyperparameters
         self.epsilon = 0.2
