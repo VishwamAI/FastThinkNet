@@ -4,7 +4,7 @@ pillow==10.4.0
 requests==2.32.3
 
 # Deep learning frameworks (CPU versions for CI/CD)
-tensorflow-cpu==2.17.0
+tensorflow-cpu==2.15.0
 torch==2.3.1
 torchvision==0.18.1
 
@@ -26,8 +26,6 @@ Werkzeug==3.0.3
 gym
 matplotlib
 pytest
-tensorflow
-numpy
 tqdm
 
 # Dependencies for neural-learning-agent are included in the above list
