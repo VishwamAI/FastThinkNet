@@ -2,9 +2,15 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from pyro.nn import PyroModule, PyroSample
+import pyro.distributions as dist
+import gpytorch
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Define the neural network architecture
+# Define the original FastThinkNet architecture
 class FastThinkNet(nn.Module):
     def __init__(self):
         super(FastThinkNet, self).__init__()
@@ -20,10 +26,69 @@ class FastThinkNet(nn.Module):
         x = self.fc2(x)  # Final layer
         return x
 
+# Define the advanced neural network architecture
+class AdvancedFastThinkNet(nn.Module):
+    def __init__(self, input_dim=784, hidden_dim=128, output_dim=10, latent_dim=20):
+        super(AdvancedFastThinkNet, self).__init__()
+        self.input_dim = input_dim
+        self.output_dim = output_dim
 
-# Instantiate the model
-model = FastThinkNet()
+        # BNN component
+        self.bnn_layer = PyroModule[nn.Linear](input_dim, hidden_dim)
+        self.bnn_layer.weight = PyroSample(dist.Normal(0., 1.).expand([hidden_dim, input_dim]).to_event(2))
+        self.bnn_layer.bias = PyroSample(dist.Normal(0., 1.).expand([hidden_dim]).to_event(1))
 
-# Move the model to GPU if available
+        # GP component
+        self.gp_layer = gpytorch.models.ApproximateGP(gpytorch.kernels.RBFKernel())
+
+        # VAE components
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, latent_dim * 2)
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, input_dim)
+        )
+
+        # Output layer
+        self.fc_out = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        try:
+            # Flatten the input tensor
+            x = x.view(-1, self.input_dim)
+
+            # BNN forward pass
+            x = F.relu(self.bnn_layer(x))
+
+            # GP forward pass (simplified)
+            x = self.gp_layer(x)
+
+            # VAE forward pass
+            encoded = self.encoder(x)
+            mu, logvar = encoded.chunk(2, dim=-1)
+            z = self.reparameterize(mu, logvar)
+            x = self.decoder(z)
+
+            # Final output
+            return self.fc_out(x)
+        except Exception as e:
+            logger.error(f"Error in forward pass: {str(e)}")
+            raise
+
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+# Instantiate the models
+fast_think_net = FastThinkNet()
+advanced_fast_think_net = AdvancedFastThinkNet()
+
+# Move the models to GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
+fast_think_net.to(device)
+advanced_fast_think_net.to(device)
