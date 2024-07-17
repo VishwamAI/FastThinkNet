@@ -10,7 +10,9 @@ class FastThinkNetRL:
 
         # Policy network
         self.policy_network = self._build_network(
-            state_dim, action_dim, "policy"
+            state_dim,
+            action_dim,
+            "policy"
         )
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
@@ -149,3 +151,4 @@ class FastThinkNetRL:
 # New line to trigger git change detection
 # Trivial change to trigger git detection
 # Dummy comment to ensure git recognizes the changes
+
