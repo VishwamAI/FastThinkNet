@@ -4,11 +4,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoderLayer, TransformerEncoder
 import logging
+import shap
+import lime
+import lime.lime_image
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 class AdvancedFastThinkNet(nn.Module):
     def __init__(
@@ -62,11 +64,16 @@ class AdvancedFastThinkNet(nn.Module):
                     int(self.input_dim ** 0.5),
                 )
 
+            # Store activations for feature importance analysis
+            self.activations = {}
+
             # Convolutional layers
             try:
                 x = F.relu(self.conv1(x))
+                self.activations['conv1'] = x
                 x = F.max_pool2d(x, 2)
                 x = F.relu(self.conv2(x))
+                self.activations['conv2'] = x
                 x = F.max_pool2d(x, 2)
                 logger.info(f"After conv layers shape: {x.shape}")
             except RuntimeError as e:
@@ -84,6 +91,7 @@ class AdvancedFastThinkNet(nn.Module):
             # LSTM layer
             try:
                 x, _ = self.lstm(x)
+                self.activations['lstm'] = x
                 logger.info(f"After LSTM shape: {x.shape}")
             except RuntimeError as e:
                 logger.error(f"Error in LSTM layer: {str(e)}")
@@ -94,6 +102,7 @@ class AdvancedFastThinkNet(nn.Module):
                 x = x.permute(1, 0, 2)  # Change to (seq_len, batch, features)
                 x = self.attention(x)
                 x = x.permute(1, 0, 2)  # Change back to (batch, seq_len, features)
+                self.activations['attention'] = x
                 logger.info(f"After attention shape: {x.shape}")
             except RuntimeError as e:
                 logger.error(f"Error in attention mechanism: {str(e)}")
@@ -105,8 +114,10 @@ class AdvancedFastThinkNet(nn.Module):
             # Fully connected layers
             try:
                 x = F.relu(self.fc1(x))
+                self.activations['fc1'] = x
                 x = self.dropout(x)
                 x = self.fc2(x)
+                self.activations['fc2'] = x
                 logger.info(f"Final output shape: {x.shape}")
             except RuntimeError as e:
                 logger.error(f"Error in fully connected layers: {str(e)}")
@@ -130,6 +141,42 @@ class AdvancedFastThinkNet(nn.Module):
         difficulty = min(1.0, epoch / max_epochs)
         self.dropout.p = 0.5 * difficulty
         logger.info(f"Curriculum learning: Set dropout to {self.dropout.p}")
+
+    def analyze_feature_importance(self, X, y, method='shap', num_samples=100):
+        """
+        Analyze feature importance using SHAP or LIME.
+
+        Args:
+        X (torch.Tensor): Input data
+        y (torch.Tensor): Target labels
+        method (str): 'shap' or 'lime'
+        num_samples (int): Number of samples to use for analysis
+
+        Returns:
+        dict: Feature importance scores
+        """
+        if method == 'shap':
+            explainer = shap.DeepExplainer(self, X[:num_samples])
+            shap_values = explainer.shap_values(X[:num_samples])
+            return {'shap_values': shap_values}
+        elif method == 'lime':
+            explainer = lime.lime_image.LimeImageExplainer()
+            explanation = explainer.explain_instance(X[0].numpy(),
+                                                     self.predict_proba,
+                                                     top_labels=5,
+                                                     hide_color=0,
+                                                     num_samples=num_samples)
+            return {'lime_explanation': explanation}
+        else:
+            raise ValueError("Method must be either 'shap' or 'lime'")
+
+    def predict_proba(self, input_data):
+        """
+        Helper method for LIME to get class probabilities.
+        """
+        with torch.no_grad():
+            output = self(torch.from_numpy(input_data).float())
+        return output.numpy()
 
 
 # Instantiate the advanced model
