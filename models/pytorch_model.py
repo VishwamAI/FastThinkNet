@@ -30,7 +30,9 @@ class AdvancedFastThinkNet(nn.Module):
     def __init__(self, input_dim=784, hidden_dim=128, output_dim=10, latent_dim=20):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
         self.output_dim = output_dim
+        self.latent_dim = latent_dim
 
         # BNN component
         self.bnn_layer = PyroModule[nn.Linear](input_dim, hidden_dim)
@@ -46,14 +48,14 @@ class AdvancedFastThinkNet(nn.Module):
 
         # VAE components
         self.encoder = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, latent_dim * 2)
         )
         self.decoder = nn.Sequential(
             nn.Linear(latent_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, input_dim)
+            nn.Linear(hidden_dim, hidden_dim)
         )
 
         # Output layer
@@ -61,8 +63,14 @@ class AdvancedFastThinkNet(nn.Module):
 
     def forward(self, x):
         try:
-            # Flatten the input tensor
-            x = x.view(-1, self.input_dim)
+            # Ensure input is correctly shaped
+            if x.dim() == 4:  # Assuming input is (batch_size, channels, height, width)
+                x = x.view(-1, self.input_dim)
+            elif x.dim() == 2:
+                if x.size(1) != self.input_dim:
+                    raise ValueError(f"Expected input dimension {self.input_dim}, but got {x.size(1)}")
+            else:
+                raise ValueError(f"Unexpected input shape: {x.shape}")
 
             # BNN forward pass
             x = F.relu(self.bnn_layer(x))

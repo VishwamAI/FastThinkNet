@@ -28,7 +28,8 @@ def test_model_initialization(model):
     assert isinstance(model.bnn_layer, PyroModule)
 
     # Check for GP components
-    assert hasattr(model, 'gp_layer')
+    assert hasattr(model, 'gp_approx')
+    assert isinstance(model.gp_approx, torch.nn.Sequential)
 
     # Check for VAE components
     assert hasattr(model, 'encoder')
