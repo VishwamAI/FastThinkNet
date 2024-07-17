@@ -34,6 +34,7 @@ def train(model, train_data, train_labels, epochs, batch_size):
             verbose=1
         )
 
+
 def evaluate(model, test_data, test_labels):
     loss, accuracy = model.evaluate(test_data, test_labels, verbose=0)
     print(f"Test Loss: {loss:.4f}")
