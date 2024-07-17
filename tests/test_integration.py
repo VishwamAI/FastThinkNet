@@ -90,7 +90,7 @@ def test_integration(model, data_pipeline):
 
 
 def test_error_handling(model):
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         # Test with incorrect input shape
         invalid_input = torch.randn(32, 100)  # Incorrect input size
         model(invalid_input)
