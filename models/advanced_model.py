@@ -11,13 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(
-        self,
-        input_dim=784,
-        hidden_dim=256,
-        output_dim=10,
-        num_layers=4
-    ):
+    def __init__(self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -28,16 +22,11 @@ class AdvancedFastThinkNet(nn.Module):
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
 
         # Recurrent layer for sequence processing
-        self.lstm = nn.LSTM(
-            64, hidden_dim, num_layers=2, batch_first=True
-        )
+        self.lstm = nn.LSTM(64, hidden_dim, num_layers=2, batch_first=True)
 
         # Attention mechanism
         self.attention = TransformerEncoder(
-            TransformerEncoderLayer(
-                d_model=hidden_dim,
-                nhead=8
-            ),
+            TransformerEncoderLayer(d_model=hidden_dim, nhead=8),
             num_layers=num_layers,
         )
 

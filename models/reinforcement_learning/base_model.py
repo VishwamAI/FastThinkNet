@@ -3,31 +3,20 @@ import numpy as np
 
 
 class FastThinkNetRL:
-    def __init__(
-        self,
-        state_dim,
-        action_dim,
-        learning_rate=0.001
-    ):
+    def __init__(self, state_dim, action_dim, learning_rate=0.001):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.learning_rate = learning_rate
 
         # Policy network
-        self.policy_network = self._build_network(
-            state_dim, action_dim, "policy"
-        )
+        self.policy_network = self._build_network(state_dim, action_dim, "policy")
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # Value network
         self.value_network = self._build_network(state_dim, 1, "value")
-        self.target_value_network = self._build_network(
-            state_dim, 1, "target_value"
-        )
+        self.target_value_network = self._build_network(state_dim, 1, "target_value")
         # Optimizer for the value network
-        self.value_optimizer = tf.keras.optimizers.Adam(
-            learning_rate=learning_rate
-        )
+        self.value_optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
         # PPO hyperparameters
         self.epsilon = 0.2
@@ -35,25 +24,21 @@ class FastThinkNetRL:
         self.entropy_coef = 0.01
 
     def _build_network(self, input_dim, output_dim, name):
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(
-                64, activation="relu", input_shape=(input_dim,)
-            ),
-            tf.keras.layers.Dense(64, activation="relu"),
-            tf.keras.layers.Dense(
-                output_dim,
-                activation="softmax" if name == "policy" else None
-            ),
-        ])
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(
+                    output_dim, activation="softmax" if name == "policy" else None
+                ),
+            ]
+        )
         return model
 
     def choose_action(self, state):
         state = np.array(state).reshape(1, -1)
         action_probs = self.policy_network(state).numpy()[0]
-        return np.random.choice(
-            self.action_dim,
-            p=action_probs
-        )
+        return np.random.choice(self.action_dim, p=action_probs)
 
     def collect_experience(self, env, num_episodes):
         experiences = []
@@ -64,9 +49,7 @@ class FastThinkNetRL:
             while not done:
                 action = self.choose_action(state)
                 next_state, reward, done, _ = env.step(action)
-                episode_experience.append(
-                    (state, action, reward, next_state, done)
-                )
+                episode_experience.append((state, action, reward, next_state, done))
                 state = next_state
             experiences.extend(episode_experience)
         return experiences
@@ -76,24 +59,15 @@ class FastThinkNetRL:
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
             selected_action_probs = tf.reduce_sum(
-                action_probs * tf.one_hot(actions, self.action_dim),
-                axis=1
+                action_probs * tf.one_hot(actions, self.action_dim), axis=1
             )
             ratio = selected_action_probs / old_probs
-            clipped_ratio = tf.clip_by_value(
-                ratio,
-                1 - self.epsilon,
-                1 + self.epsilon
-            )
+            clipped_ratio = tf.clip_by_value(ratio, 1 - self.epsilon, 1 + self.epsilon)
             policy_loss = -tf.reduce_mean(
-                tf.minimum(
-                    ratio * advantages,
-                    clipped_ratio * advantages
-                )
+                tf.minimum(ratio * advantages, clipped_ratio * advantages)
             )
             entropy = -tf.reduce_sum(
-                action_probs * tf.math.log(action_probs + 1e-8),
-                axis=1
+                action_probs * tf.math.log(action_probs + 1e-8), axis=1
             )
             loss = policy_loss - self.entropy_coef * tf.reduce_mean(entropy)
 
