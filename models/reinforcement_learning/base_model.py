@@ -133,8 +133,9 @@ class FastThinkNetRL:
             advantages = returns - values
 
             # Update policy and value function
+            old_action_probs = self.policy_network(states).numpy()
             policy_loss = self.update_policy(
-                states, actions, self.policy_network(states).numpy(), advantages
+                states, actions, old_action_probs, advantages
             )
             value_loss = self.update_value_function(states, returns)
 
