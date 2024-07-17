@@ -2,15 +2,16 @@ import os
 import sys
 import pytest
 import torch
-from models.pytorch_model import FastThinkNet
+from models.pytorch_model import AdvancedFastThinkNet
 from scripts.tf_data_pipeline import create_data_pipeline
+from pyro.nn import PyroModule
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 @pytest.fixture
 def model():
-    return FastThinkNet()
+    return AdvancedFastThinkNet()
 
 
 @pytest.fixture
@@ -19,11 +20,19 @@ def data_pipeline():
 
 
 def test_model_initialization(model):
-    assert isinstance(model, FastThinkNet)
-    assert model.fc1.in_features == 784
-    assert model.fc1.out_features == 128
-    assert model.fc2.out_features == 64
-    assert model.fc3.out_features == 10
+    assert isinstance(model, AdvancedFastThinkNet)
+    assert model.input_dim == 784
+    assert model.output_dim == 10
+
+    # Check for BNN components
+    assert isinstance(model.bnn_layer, PyroModule)
+
+    # Check for GP components
+    assert hasattr(model, 'gp_layer')
+
+    # Check for VAE components
+    assert hasattr(model, 'encoder')
+    assert hasattr(model, 'decoder')
 
 
 def test_forward_pass_different_sizes(model):
@@ -88,7 +97,7 @@ def test_error_handling(model):
 
 def test_gpu_support():
     if torch.cuda.is_available():
-        model = FastThinkNet().cuda()
+        model = AdvancedFastThinkNet().cuda()
         assert next(model.parameters()).is_cuda
     else:
         pytest.skip("CUDA is not available, skipping GPU test")
