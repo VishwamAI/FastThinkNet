@@ -24,15 +24,14 @@ class FastThinkNetRL:
         self.entropy_coef = 0.01
 
     def _build_network(self, input_dim, output_dim, name):
-        model = tf.keras.Sequential(
-            [
-                tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
-                tf.keras.layers.Dense(64, activation="relu"),
-                tf.keras.layers.Dense(
-                    output_dim, activation="softmax" if name == "policy" else None
-                ),
-            ]
-        )
+        model = tf.keras.Sequential([
+            tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+            tf.keras.layers.Dense(64, activation="relu"),
+            tf.keras.layers.Dense(
+                output_dim,
+                activation="softmax" if name == "policy" else None
+            ),
+        ])
         return model
 
     def choose_action(self, state):
@@ -59,15 +58,19 @@ class FastThinkNetRL:
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
             selected_action_probs = tf.reduce_sum(
-                action_probs * tf.one_hot(actions, self.action_dim), axis=1
+                action_probs * tf.one_hot(actions, self.action_dim),
+                axis=1
             )
             ratio = selected_action_probs / old_probs
-            clipped_ratio = tf.clip_by_value(ratio, 1 - self.epsilon, 1 + self.epsilon)
+            clipped_ratio = tf.clip_by_value(
+                ratio, 1 - self.epsilon, 1 + self.epsilon
+            )
             policy_loss = -tf.reduce_mean(
                 tf.minimum(ratio * advantages, clipped_ratio * advantages)
             )
             entropy = -tf.reduce_sum(
-                action_probs * tf.math.log(action_probs + 1e-8), axis=1
+                action_probs * tf.math.log(action_probs + 1e-8),
+                axis=1
             )
             loss = policy_loss - self.entropy_coef * tf.reduce_mean(entropy)
 

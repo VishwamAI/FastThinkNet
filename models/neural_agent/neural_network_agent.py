@@ -27,19 +27,17 @@ class NeuralNetworkAgent(BaseAgent):
         self.target_model.set_weights(self.model.get_weights())
 
     def create_model(self):
-        model = tf.keras.Sequential(
-            [
-                tf.keras.layers.Conv2D(
-                    32, (3, 3), activation="relu", input_shape=self.input_shape
-                ),
-                tf.keras.layers.MaxPooling2D((2, 2)),
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.Dense(64, activation="relu"),
-                tf.keras.layers.Dense(self.action_space, activation="linear"),
-            ]
-        )
+        model = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(
+                32, (3, 3), activation="relu", input_shape=self.input_shape
+            ),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(64, activation="relu"),
+            tf.keras.layers.Dense(self.action_space, activation="linear"),
+        ])
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
+            optimizer=tf.keras.optimizers.Adam(lr=self.learning_rate),
             loss="mse",
         )
         return model

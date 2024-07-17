@@ -11,28 +11,26 @@ class NeuralNetworkAgent:
         self.target_model.set_weights(self.model.get_weights())
 
     def create_model(self):
-        model = tf.keras.Sequential(
-            [
-                tf.keras.layers.Conv2D(
-                    32, (3, 3), input_shape=self.input_shape, padding="same"
-                ),
-                tf.keras.layers.BatchNormalization(),
-                tf.keras.layers.Activation("relu"),
-                tf.keras.layers.Dropout(0.2),
-                tf.keras.layers.MaxPooling2D((2, 2)),
-                tf.keras.layers.Conv2D(64, (3, 3), padding="same"),
-                tf.keras.layers.BatchNormalization(),
-                tf.keras.layers.Activation("relu"),
-                tf.keras.layers.Dropout(0.2),
-                tf.keras.layers.MaxPooling2D((2, 2)),
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.Dense(128),
-                tf.keras.layers.BatchNormalization(),
-                tf.keras.layers.Activation("relu"),
-                tf.keras.layers.Dropout(0.3),
-                tf.keras.layers.Dense(self.action_space, activation="linear"),
-            ]
-        )
+        model = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(
+                32, (3, 3), input_shape=self.input_shape, padding="same"
+            ),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Activation("relu"),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Conv2D(64, (3, 3), padding="same"),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Activation("relu"),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(128),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Activation("relu"),
+            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(self.action_space, activation="linear"),
+        ])
         model.compile(
             optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse"
         )
@@ -44,8 +42,6 @@ class NeuralNetworkAgent:
         state = np.expand_dims(state, axis=0)
         q_values = self.model.predict(state)
         return np.argmax(q_values[0])
-
-    # Removed redundant method (replaced by updated learn method)
 
     def train(
         self,
@@ -106,8 +102,6 @@ class NeuralNetworkAgent:
                     f"Avg Reward: {np.mean(episode_rewards[-100:]):.2f}, "
                     f"Epsilon: {epsilon:.2f}"
                 )
-
-        return episode_rewards
 
         return episode_rewards
 
