@@ -29,7 +29,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python-version }}-${{ github.sha }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python-version }}-${{ github.sha }}-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
@@ -107,6 +107,9 @@ jobs:
       run: |
         pip install --upgrade flake8
         flake8 --version
+
+    - name: Clear flake8 cache
+      run: rm -rf ~/.cache/flake8
 
     - name: Display content of base_model.py
       run: cat ./models/reinforcement_learning/base_model.py
@@ -227,7 +230,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-3.12-${{ github.sha }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-3.12-${{ github.sha }}-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
