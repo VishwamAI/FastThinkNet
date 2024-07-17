@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+
 class NeuralNetworkAgent:
     def __init__(self, input_shape, num_actions):
         self.input_shape = input_shape
