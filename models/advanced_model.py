@@ -15,17 +15,27 @@ logger = logging.getLogger(__name__)
 
 # Custom exceptions
 
+
 class InputShapeError(ValueError):
     pass
+
 
 class ConvolutionError(RuntimeError):
     pass
 
+
+class PoolingError(RuntimeError):
+    pass
+
+
+
 class LSTMError(RuntimeError):
     pass
 
+
 class AttentionError(RuntimeError):
     pass
+
 
 class FCLayerError(RuntimeError):
     pass
