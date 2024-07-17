@@ -139,5 +139,3 @@ class FastThinkNetRL:
         # component. For example, it could use the DL model's output as part
         # of the state representation
         pass
-
-
