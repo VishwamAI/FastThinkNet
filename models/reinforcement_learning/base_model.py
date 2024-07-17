@@ -68,7 +68,8 @@ class FastThinkNetRL:
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
             selected_action_probs = tf.reduce_sum(
-                action_probs * tf.one_hot(actions, self.action_dim), axis=1
+                action_probs * tf.one_hot(actions, self.action_dim),
+                axis=1
             )
             ratio = selected_action_probs / old_probs
             clipped_ratio = tf.clip_by_value(
