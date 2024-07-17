@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from pyro.nn import PyroModule, PyroSample
 import pyro.distributions as dist
-import gpytorch
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -38,8 +37,12 @@ class AdvancedFastThinkNet(nn.Module):
         self.bnn_layer.weight = PyroSample(dist.Normal(0., 1.).expand([hidden_dim, input_dim]).to_event(2))
         self.bnn_layer.bias = PyroSample(dist.Normal(0., 1.).expand([hidden_dim]).to_event(1))
 
-        # GP component
-        self.gp_layer = gpytorch.models.ApproximateGP(gpytorch.kernels.RBFKernel())
+        # GP component approximation
+        self.gp_approx = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim)
+        )
 
         # VAE components
         self.encoder = nn.Sequential(
@@ -64,8 +67,8 @@ class AdvancedFastThinkNet(nn.Module):
             # BNN forward pass
             x = F.relu(self.bnn_layer(x))
 
-            # GP forward pass (simplified)
-            x = self.gp_layer(x)
+            # GP approximation forward pass
+            x = self.gp_approx(x)
 
             # VAE forward pass
             encoded = self.encoder(x)
