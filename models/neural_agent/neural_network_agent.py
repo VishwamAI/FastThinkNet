@@ -27,19 +27,19 @@ class NeuralNetworkAgent(BaseAgent):
         self.target_model.set_weights(self.model.get_weights())
 
     def create_model(self):
-        model = tf.keras.Sequential(
-            [
-                tf.keras.layers.Conv2D(
-                    32, (3, 3), activation="relu", input_shape=self.input_shape
-                ),
-                tf.keras.layers.MaxPooling2D((2, 2)),
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.Dense(64, activation="relu"),
-                tf.keras.layers.Dense(self.action_space, activation="linear"),
-            ]
-        )
+        model = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(
+                32, (3, 3), activation="relu", input_shape=self.input_shape
+            ),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(64, activation="relu"),
+            tf.keras.layers.Dense(self.action_space, activation="linear"),
+        ])
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
+            optimizer=tf.keras.optimizers.Adam(
+                learning_rate=self.learning_rate
+            ),
             loss="mse",
         )
         return model
@@ -54,6 +54,9 @@ class NeuralNetworkAgent(BaseAgent):
         target_q_values = self.target_model.predict(next_states)
         max_target_q_values = np.max(target_q_values, axis=1)
         target_q_values = rewards + self.gamma * max_target_q_values * (1 - dones)
+        target_q_values = (
+            rewards + self.gamma * max_target_q_values * (1 - dones)
+        )
 
         q_values = self.model.predict(states)
         q_values[np.arange(q_values.shape[0]), actions] = target_q_values
