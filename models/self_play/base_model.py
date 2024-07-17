@@ -87,9 +87,7 @@ class FastThinkNetSelfPlay(nn.Module):
             next_state, reward, done, _ = env.step(action)
             next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0)
 
-            experiences.append(
-                (state_tensor, action, reward, next_state_tensor, done)
-            )
+            experiences.append((state_tensor, action, reward, next_state_tensor, done))
             state = next_state
 
         return experiences
@@ -180,9 +178,7 @@ class FastThinkNetSelfPlay(nn.Module):
             ].weight.data.clone()
 
             # Transfer policy from RL model
-            self.model[-1].weight.data = (
-                rl_model.policy_net[-1].weight.data.clone()
-            )
+            self.model[-1].weight.data = rl_model.policy_net[-1].weight.data.clone()
 
         self.transfer_knowledge = transfer_knowledge
 
