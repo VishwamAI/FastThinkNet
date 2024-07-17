@@ -141,10 +141,3 @@ class FastThinkNetRL:
         pass
 
 
-# Example usage:
-# env = gym.make('CartPole-v1')
-# state_dim = env.observation_space.shape[0]
-# action_dim = env.action_space.n
-# rl_model = FastThinkNetRL(state_dim, action_dim)
-# rl_model.train(env, num_episodes=1000)
-
