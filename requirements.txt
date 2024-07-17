@@ -5,6 +5,7 @@ requests==2.32.3
 
 # Deep learning frameworks (CPU versions for CI/CD)
 tensorflow-cpu==2.15.0
+tensorboard==2.15.0
 torch==2.3.1
 torchvision==0.18.1
 
