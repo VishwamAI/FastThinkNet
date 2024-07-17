@@ -11,30 +11,29 @@ class NeuralNetworkAgent:
         self.target_model.set_weights(self.model.get_weights())
 
     def create_model(self):
-        model = tf.keras.Sequential(
-            [
-                tf.keras.layers.Conv2D(
-                    32, (3, 3), input_shape=self.input_shape, padding="same"
-                ),
-                tf.keras.layers.BatchNormalization(),
-                tf.keras.layers.Activation("relu"),
-                tf.keras.layers.Dropout(0.2),
-                tf.keras.layers.MaxPooling2D((2, 2)),
-                tf.keras.layers.Conv2D(64, (3, 3), padding="same"),
-                tf.keras.layers.BatchNormalization(),
-                tf.keras.layers.Activation("relu"),
-                tf.keras.layers.Dropout(0.2),
-                tf.keras.layers.MaxPooling2D((2, 2)),
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.Dense(128),
-                tf.keras.layers.BatchNormalization(),
-                tf.keras.layers.Activation("relu"),
-                tf.keras.layers.Dropout(0.3),
-                tf.keras.layers.Dense(self.action_space, activation="linear"),
-            ]
-        )
+        model = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(
+                32, (3, 3), input_shape=self.input_shape, padding="same"
+            ),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Activation("relu"),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Conv2D(64, (3, 3), padding="same"),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Activation("relu"),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(128),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Activation("relu"),
+            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(self.action_space, activation="linear"),
+        ])
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse"
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+            loss="mse"
         )
         return model
 
@@ -109,6 +108,8 @@ class NeuralNetworkAgent:
 
         return episode_rewards
 
+        return episode_rewards
+
     def learn(self, states, actions, rewards, next_states, dones):
         target_q_values = self.model.predict(states)
         next_q_values = self.target_model.predict(next_states)
@@ -117,8 +118,8 @@ class NeuralNetworkAgent:
             if dones[i]:
                 target_q_values[i][actions[i]] = rewards[i]
             else:
-                target_q_values[i][actions[i]] = rewards[i] + self.gamma * np.max(
-                    next_q_values[i]
+                target_q_values[i][actions[i]] = (
+                    rewards[i] + self.gamma * np.max(next_q_values[i])
                 )
 
         self.model.fit(states, target_q_values, verbose=0)
