@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Custom exceptions
+
 class InputShapeError(ValueError):
     pass
 
@@ -80,7 +81,9 @@ class AdvancedFastThinkNet(nn.Module):
             if not isinstance(x, torch.Tensor):
                 raise InputShapeError("Input must be a torch.Tensor")
             if x.dim() not in [2, 4]:
-                raise InputShapeError(f"Expected input to be 2D or 4D, but got {x.dim()}D")
+                raise InputShapeError(
+                    f"Expected input to be 2D or 4D, but got {x.dim()}D"
+                )
 
             if self.debug_mode:
                 logger.debug(f"Input shape: {x.shape}")
@@ -146,7 +149,9 @@ class AdvancedFastThinkNet(nn.Module):
             return F.log_softmax(x, dim=1)
 
         except torch.cuda.OutOfMemoryError as e:
-            logger.critical(f"CUDA out of memory: {str(e)}. Falling back to CPU.")
+            logger.critical(
+                f"CUDA out of memory: {str(e)}. Falling back to CPU."
+            )
             self.to('cpu')
             x = x.to('cpu')
             return self.forward(x)  # Recursive call with CPU tensors
@@ -163,7 +168,9 @@ class AdvancedFastThinkNet(nn.Module):
             difficulty = min(1.0, epoch / max_epochs)
             self.dropout.p = 0.5 * difficulty
             if self.debug_mode:
-                logger.debug(f"Curriculum learning: Set dropout to {self.dropout.p}")
+                logger.debug(
+                    f"Curriculum learning: Set dropout to {self.dropout.p}"
+                )
         except Exception as e:
             logger.error(f"Error in curriculum learning: {str(e)}")
             raise
@@ -185,7 +192,10 @@ class AdvancedFastThinkNet(nn.Module):
             if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
-                raise ValueError(f"X and y must have the same number of samples. Got X: {X.shape[0]}, y: {y.shape[0]}")
+                raise ValueError(
+                    f"X and y must have the same number of samples. "
+                    f"Got X: {X.shape[0]}, y: {y.shape[0]}"
+                )
 
             if method == 'shap':
                 explainer = shap.DeepExplainer(self, X[:num_samples])
@@ -193,11 +203,13 @@ class AdvancedFastThinkNet(nn.Module):
                 return {'shap_values': shap_values}
             elif method == 'lime':
                 explainer = lime.lime_image.LimeImageExplainer()
-                explanation = explainer.explain_instance(X[0].numpy(),
-                                                         self.predict_proba,
-                                                         top_labels=5,
-                                                         hide_color=0,
-                                                         num_samples=num_samples)
+                explanation = explainer.explain_instance(
+                    X[0].numpy(),
+                    self.predict_proba,
+                    top_labels=5,
+                    hide_color=0,
+                    num_samples=num_samples
+                )
                 return {'lime_explanation': explanation}
             else:
                 raise ValueError("Method must be either 'shap' or 'lime'")
