@@ -35,6 +35,10 @@ def test_model_initialization(model):
     assert hasattr(model, 'encoder')
     assert hasattr(model, 'decoder')
 
+    # Check for vae_loss method
+    assert hasattr(model, 'vae_loss'), "vae_loss method is missing from the model"
+    assert callable(getattr(model, 'vae_loss')), "vae_loss is not a callable method"
+
 
 def test_forward_pass_different_sizes(model):
     batch_sizes = [1, 16, 32, 64]
