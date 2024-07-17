@@ -45,17 +45,23 @@ def test_forward_pass_different_sizes(model):
 
 
 def test_basic_training_loop(model, data_pipeline):
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+    criterion = torch.nn.NLLLoss()
+
+    def custom_loss(outputs, labels, model):
+        nll_loss = criterion(outputs, labels)
+        vae_loss = model.vae_loss()
+        gp_loss = model.gp_loss()
+        return nll_loss + 0.1 * vae_loss + 0.01 * gp_loss
 
     initial_loss = None
-    for images, labels in data_pipeline.take(10):
+    for images, labels in data_pipeline.take(50):
         images = torch.from_numpy(images.numpy()).float().view(-1, 784)
         labels = torch.from_numpy(labels.numpy()).long()
 
         optimizer.zero_grad()
         outputs = model(images)
-        loss = criterion(outputs, labels)
+        loss = custom_loss(outputs, labels, model)
         loss.backward()
         optimizer.step()
 
