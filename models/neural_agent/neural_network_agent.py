@@ -4,8 +4,9 @@ from fastthinknet.base import BaseAgent
 
 
 class NeuralNetworkAgent(BaseAgent):
-    def __init__(self, input_shape=(64, 64, 3), action_space=4, learning_rate=0.001,
-                 gamma=0.99, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.01):
+    def __init__(self, input_shape=(64, 64, 3), action_space=4,
+                 learning_rate=0.001, gamma=0.99, epsilon=1.0,
+                 epsilon_decay=0.995, epsilon_min=0.01):
         super().__init__()
         self.input_shape = input_shape
         self.action_space = action_space
