@@ -8,6 +8,9 @@ import shap
 import lime
 import lime.lime_image
 from contextlib import contextmanager
+import pyro.nn as pyronn
+import gpytorch
+from torch.distributions import Normal
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -77,9 +80,19 @@ class AdvancedFastThinkNet(nn.Module):
             num_layers=num_layers,
         )
 
-        # Fully connected layers
-        self.fc1 = nn.Linear(hidden_dim, hidden_dim)
-        self.fc2 = nn.Linear(hidden_dim, output_dim)
+        # Bayesian fully connected layers
+        self.fc1 = pyronn.PyroModule[nn.Linear](hidden_dim, hidden_dim)
+        self.fc2 = pyronn.PyroModule[nn.Linear](hidden_dim, output_dim)
+
+        # Gaussian Process layer
+        self.gp_layer = gpytorch.models.ApproximateGP(
+            gpytorch.kernels.RBFKernel(ard_num_dims=hidden_dim)
+        )
+
+        # VAE components
+        self.fc_mu = nn.Linear(hidden_dim, hidden_dim)
+        self.fc_logvar = nn.Linear(hidden_dim, hidden_dim)
+        self.fc_decoder = nn.Linear(hidden_dim, input_dim)
 
         # Dropout for regularization
         self.dropout = nn.Dropout(0.5)
@@ -100,14 +113,13 @@ class AdvancedFastThinkNet(nn.Module):
             if self.debug_mode:
                 logger.debug(f"Input shape: {x.shape}")
 
-            # Reshape input if necessary
-            if x.dim() == 2:
-                x = x.view(
-                    -1,
-                    1,
-                    int(self.input_dim ** 0.5),
-                    int(self.input_dim ** 0.5),
-                )
+            # VAE encoding
+            mu, logvar = self.vae_encode(x)
+            z = self.vae_reparameterize(mu, logvar)
+            x_reconstructed = self.vae_decode(z)
+
+            # Use reconstructed input for further processing
+            x = x_reconstructed.view(-1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5))
 
             # Store activations for feature importance analysis
             self.activations = {}
@@ -150,7 +162,10 @@ class AdvancedFastThinkNet(nn.Module):
             # Take the last output of the sequence
             x = x[:, -1, :]
 
-            # Fully connected layers
+            # Gaussian Process layer
+            x = self.gp_layer(x)
+
+            # Bayesian fully connected layers
             with error_handling_context("fully connected layers"):
                 x = F.relu(self.fc1(x))
                 self.activations['fc1'] = x
@@ -242,6 +257,18 @@ class AdvancedFastThinkNet(nn.Module):
         except Exception as e:
             logger.error(f"Error in predict_proba: {str(e)}")
             raise
+
+    def vae_encode(self, x):
+        h = F.relu(self.fc1(x.view(-1, self.input_dim)))
+        return self.fc_mu(h), self.fc_logvar(h)
+
+    def vae_decode(self, z):
+        return torch.sigmoid(self.fc_decoder(z))
+
+    def vae_reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
 
 
 # Instantiate the advanced model
