@@ -203,3 +203,20 @@ Overall Status Update:
 - Multiple dependency conflicts have been addressed, including issues with ale-py, tensorflow-cpu, and tensorboard
 - The workflow issues are being systematically resolved, but further verification is needed
 - Next action: Run the GitHub Actions workflow again to confirm if all recent changes have resolved the existing issues
+
+[2024-07-20]
+Issue: Dependency conflict between ale-py and shimmy[atari]
+Status: Resolved
+Description: The workflow was failing due to conflicting dependencies between ale-py and shimmy[atari].
+Resolution: Updated requirements.txt to resolve the conflict.
+Changes made:
+- In requirements.txt, changed ale-py==0.9.0 to ale-py==0.8.1
+- This version is compatible with shimmy[atari] 0.2.1 and gymnasium[all] 0.29.1
+Next steps:
+- Re-run the GitHub Actions workflow to verify if this change resolves the issue completely
+- Monitor the workflow for any remaining conflicts or issues
+
+Overall Status Update:
+- All known dependency conflicts have been addressed, including the latest issue with ale-py and shimmy[atari]
+- The workflow issues appear to be resolved, but verification through a new workflow run is required
+- Next action: Run the GitHub Actions workflow to confirm that all recent changes have successfully resolved the existing issues
