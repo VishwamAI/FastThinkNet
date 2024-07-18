@@ -105,7 +105,9 @@ class AdvancedFastThinkNet(nn.Module):
     def _get_conv_output_size(self):
         # Helper function to calculate the output size after convolutions and pooling
         with torch.no_grad():
-            x = torch.zeros(1, self.input_channels, self.input_height, self.input_width)
+            x = torch.zeros(
+                1, self.input_channels, self.input_height, self.input_width
+            )
             x = F.max_pool2d(F.relu(self.conv1(x)), 2)
             x = F.max_pool2d(F.relu(self.conv2(x)), 2)
             return x.view(1, -1).size(1)  # Flatten and return the size
@@ -128,7 +130,9 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Reshape input for VAE if it's 4D
             if x.dim() == 4:
-                batch_size, channels, height, width = x.shape
+                batch_size, channels, height, width = (
+                    x.shape
+                )
                 x_flattened = x.view(batch_size, -1)
             else:
                 x_flattened = x
@@ -143,7 +147,10 @@ class AdvancedFastThinkNet(nn.Module):
                 x = x_reconstructed.view(batch_size, channels, height, width)
             else:
                 x = x_reconstructed.view(
-                    -1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5)
+                    -1,
+                    1,
+                    int(self.input_dim ** 0.5),
+                    int(self.input_dim ** 0.5)
                 )
 
             # Store activations for feature importance analysis
@@ -250,8 +257,12 @@ class AdvancedFastThinkNet(nn.Module):
                 )
 
             if method == "shap":
-                explainer = shap.DeepExplainer(self, X[:num_samples])
-                shap_values = explainer.shap_values(X[:num_samples])
+                explainer = shap.DeepExplainer(
+                    self, X[:num_samples]
+                )
+                shap_values = explainer.shap_values(
+                    X[:num_samples]
+                )
                 return {"shap_values": shap_values}
             elif method == "lime":
                 explainer = lime.lime_image.LimeImageExplainer()
@@ -299,9 +310,12 @@ class AdvancedFastThinkNet(nn.Module):
         z = self.vae_reparameterize(mu, logvar)
         x_reconstructed = self.vae_decode(z)
         reconstruction_loss = F.mse_loss(
-            x_reconstructed, self.activations["conv1"].view(-1, self.input_dim)
+            x_reconstructed,
+            self.activations["conv1"].view(-1, self.input_dim)
         )
-        kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+        kl_divergence = -0.5 * torch.sum(
+            1 + logvar - mu.pow(2) - logvar.exp()
+        )
         return reconstruction_loss + kl_divergence
 
     def gp_loss(self):
