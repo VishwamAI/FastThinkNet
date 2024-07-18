@@ -64,7 +64,8 @@ def demonstrate_meta_learning(env, model):
     mod_avg_reward, mod_success_rate = calculate_performance_metrics(
         env, model, num_episodes=50
     )
-    print(f"Avg Reward: {mod_avg_reward:.2f}, " f"Success Rate: {mod_success_rate:.2%}")
+    print(f"Avg Reward: {mod_avg_reward:.2f}, "
+          f"Success Rate: {mod_success_rate:.2%}")
 
     # Allow model to adapt (simplified adaptation process)
     for _ in range(100):
@@ -74,7 +75,12 @@ def demonstrate_meta_learning(env, model):
             action = np.argmax(model.predict(state.reshape(1, -1)))
             next_state, reward, done, _ = env.step(action)
             # Update model (simplified, in practice use proper training loop)
-            model.fit(state.reshape(1, -1), np.array([action]), epochs=1, verbose=0)
+            model.fit(
+                state.reshape(1, -1),
+                np.array([action]),
+                epochs=1,
+                verbose=0
+            )
             state = next_state
 
     print("\nPerformance after adaptation:")
