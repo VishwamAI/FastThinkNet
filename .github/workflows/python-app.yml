@@ -13,7 +13,8 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, "3.11.x", "3.12.x"]
+        python-version: [3.9, "3.11.5", "3.12.x"]
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v4
@@ -31,31 +32,38 @@ jobs:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python-version }}
         restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
           ${{ runner.os }}-pip-
 
     - name: Install base dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
         pip install -e .
         pip install flake8 black mypy pytest pytest-cov build twine
 
     - name: Install TensorFlow (Python 3.9 and 3.11 only)
       if: matrix.python-version != '3.12.x'
-      run: pip install tensorflow==2.13.0  # Specify version to ensure consistency
+      run: |
+        if [ "${{ matrix.python-version }}" = "3.11.5" ]; then
+          pip install tensorflow==2.14.0
+        else
+          pip install tensorflow==2.13.0
+        fi
 
     - name: Install PyTorch
       run: |
         if [ "${{ matrix.python-version }}" = "3.12.x" ]; then
           pip install --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu
         else
-          pip install torch==2.1.2 torchvision==0.16.2  # Specify versions to ensure consistency
+          pip install torch==2.1.2 torchvision==0.16.2
         fi
 
-    - name: Log versions
+    - name: Log versions and environment info
       run: |
         python --version
         pip --version
+        pip list
         if [ "${{ matrix.python-version }}" != "3.12.x" ]; then
           python -c "import tensorflow as tf; print(f'TensorFlow version: {tf.__version__}')"
         fi
@@ -95,3 +103,13 @@ jobs:
         pip install dist/*.whl
         python -c "import FastThinkNet; print(FastThinkNet.__version__)"
         deactivate
+
+    - name: Upload logs on failure
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: logs
+        path: |
+          ~/.cache/pip
+          **/build.log
+          **/pip.log
