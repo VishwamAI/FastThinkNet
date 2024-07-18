@@ -2,11 +2,12 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import gym
-from environments.custom_env import CustomEnv
+
 
 def load_model(model_path):
     """Load the trained model."""
     return tf.keras.models.load_model(model_path)
+
 
 def run_single_episode(env, model, render=True):
     """Run and visualize a single episode."""
@@ -27,6 +28,7 @@ def run_single_episode(env, model, render=True):
 
     return total_reward, steps
 
+
 def calculate_performance_metrics(env, model, num_episodes=100):
     """Compute average reward, success rate, etc."""
     rewards = []
@@ -43,18 +45,25 @@ def calculate_performance_metrics(env, model, num_episodes=100):
 
     return avg_reward, success_rate
 
+
 def demonstrate_meta_learning(env, model):
     """Show adaptation to environment variations."""
     print("Original environment performance:")
-    orig_avg_reward, orig_success_rate = calculate_performance_metrics(env, model, num_episodes=50)
-    print(f"Average Reward: {orig_avg_reward:.2f}, Success Rate: {orig_success_rate:.2%}")
+    orig_avg_reward, orig_success_rate = calculate_performance_metrics(
+        env, model, num_episodes=50
+    )
+    print(f"Average Reward: {orig_avg_reward:.2f}, "
+          f"Success Rate: {orig_success_rate:.2%}")
 
     # Modify environment (e.g., change reward structure)
     env.modify_reward_structure(new_reward_factor=0.5)
 
     print("\nPerformance after environment modification:")
-    mod_avg_reward, mod_success_rate = calculate_performance_metrics(env, model, num_episodes=50)
-    print(f"Average Reward: {mod_avg_reward:.2f}, Success Rate: {mod_success_rate:.2%}")
+    mod_avg_reward, mod_success_rate = calculate_performance_metrics(
+        env, model, num_episodes=50
+    )
+    print(f"Avg Reward: {mod_avg_reward:.2f}, "
+          f"Success Rate: {mod_success_rate:.2%}")
 
     # Allow model to adapt (simplified adaptation process)
     for _ in range(100):
@@ -63,15 +72,25 @@ def demonstrate_meta_learning(env, model):
         while not done:
             action = np.argmax(model.predict(state.reshape(1, -1)))
             next_state, reward, done, _ = env.step(action)
-            # Update model (simplified, in practice you'd use a proper training loop)
-            model.fit(state.reshape(1, -1), np.array([action]), epochs=1, verbose=0)
+            # Update model (simplified, in practice use proper training loop)
+            model.fit(
+                state.reshape(1, -1),
+                np.array([action]),
+                epochs=1,
+                verbose=0
+            )
             state = next_state
 
     print("\nPerformance after adaptation:")
-    adapted_avg_reward, adapted_success_rate = calculate_performance_metrics(env, model, num_episodes=50)
-    print(f"Average Reward: {adapted_avg_reward:.2f}, Success Rate: {adapted_success_rate:.2%}")
+    adapted_avg_reward, adapted_success_rate = calculate_performance_metrics(
+        env, model, num_episodes=50
+    )
+    print(f"Average Reward: {adapted_avg_reward:.2f}, "
+          f"Success Rate: {adapted_success_rate:.2%}")
 
-    return [orig_avg_reward, mod_avg_reward, adapted_avg_reward], [orig_success_rate, mod_success_rate, adapted_success_rate]
+    return ([orig_avg_reward, mod_avg_reward, adapted_avg_reward],
+            [orig_success_rate, mod_success_rate, adapted_success_rate])
+
 
 def demonstrate_self_play(env, model):
     """Showcase agent vs. agent gameplay."""
@@ -97,7 +116,7 @@ def demonstrate_self_play(env, model):
                 break
 
             # Agent 2's turn
-            action2 = np.argmax(model.predict((-next_state).reshape(1, -1)))  # Invert state for agent 2
+            action2 = np.argmax(model.predict((-next_state).reshape(1, -1)))
             state, reward, done, _ = env.step(action2)
             if done:
                 if reward > 0:
@@ -113,6 +132,7 @@ def demonstrate_self_play(env, model):
     print(f"Draws: {draws}")
 
     return agent1_wins, agent2_wins, draws
+
 
 def visualize_results(rewards, success_rates):
     """Create plots for decision-making, state representations, and rewards."""
@@ -133,6 +153,7 @@ def visualize_results(rewards, success_rates):
     plt.tight_layout()
     plt.savefig('demo_results.png')
     plt.show()
+
 
 def main():
     # Set up the environment and load the model
@@ -157,6 +178,7 @@ def main():
 
     print("\nVisualizing results...")
     visualize_results(meta_rewards, meta_success_rates)
+
 
 if __name__ == "__main__":
     main()

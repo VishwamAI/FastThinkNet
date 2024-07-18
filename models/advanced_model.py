@@ -1,24 +1,23 @@
 # Import necessary PyTorch modules
+import logging
+from contextlib import contextmanager
+
+import gpytorch
+import lime
+import lime.lime_image
+import pyro.nn as pyronn
+import shap
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn import TransformerEncoderLayer, TransformerEncoder
-import logging
-import shap
-import lime
-import lime.lime_image
-from contextlib import contextmanager
-import pyro.nn as pyronn
-import gpytorch
-from torch.distributions import Normal
+from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Custom exceptions
-
-
 class InputShapeError(ValueError):
     pass
 
@@ -29,7 +28,6 @@ class ConvolutionError(RuntimeError):
 
 class PoolingError(RuntimeError):
     pass
-
 
 
 class LSTMError(RuntimeError):
@@ -119,7 +117,11 @@ class AdvancedFastThinkNet(nn.Module):
             x_reconstructed = self.vae_decode(z)
 
             # Use reconstructed input for further processing
-            x = x_reconstructed.view(-1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5))
+            x = x_reconstructed.view(
+                -1, 1,
+                int(self.input_dim**0.5),
+                int(self.input_dim**0.5)
+            )
 
             # Store activations for feature importance analysis
             self.activations = {}
@@ -152,9 +154,7 @@ class AdvancedFastThinkNet(nn.Module):
             with error_handling_context("attention mechanism"):
                 x = x.permute(1, 0, 2)  # Change to (seq_len, batch, features)
                 x = self.attention(x)
-                x = x.permute(
-                    1, 0, 2
-                )  # Change back to (batch, seq_len, features)
+                x = x.permute(1, 0, 2)  # Back to (batch, seq_len, features)
                 self.activations['attention'] = x
                 if self.debug_mode:
                     logger.debug(f"After attention shape: {x.shape}")
@@ -218,7 +218,8 @@ class AdvancedFastThinkNet(nn.Module):
         dict: Feature importance scores
         """
         try:
-            if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
+            if (not isinstance(X, torch.Tensor) or
+                    not isinstance(y, torch.Tensor)):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
                 raise ValueError(
@@ -247,9 +248,7 @@ class AdvancedFastThinkNet(nn.Module):
             raise
 
     def predict_proba(self, input_data):
-        """
-        Helper method for LIME to get class probabilities.
-        """
+        """Helper method for LIME to get class probabilities."""
         try:
             with torch.no_grad():
                 output = self(torch.from_numpy(input_data).float())
@@ -275,14 +274,21 @@ class AdvancedFastThinkNet(nn.Module):
         logvar = self.fc_logvar(self.activations['fc1'])
         z = self.vae_reparameterize(mu, logvar)
         x_reconstructed = self.vae_decode(z)
-        reconstruction_loss = F.mse_loss(x_reconstructed, self.activations['conv1'].view(-1, self.input_dim))
-        kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+        reconstruction_loss = F.mse_loss(
+            x_reconstructed,
+            self.activations['conv1'].view(-1, self.input_dim)
+        )
+        kl_divergence = -0.5 * torch.sum(
+            1 + logvar - mu.pow(2) - logvar.exp()
+        )
         return reconstruction_loss + kl_divergence
 
     def gp_loss(self):
-        # Assuming self.gp_layer returns a gpytorch.distributions.MultivariateNormal
+        # Assuming self.gp_layer returns MultivariateNormal distribution
         gp_output = self.gp_layer(self.activations['fc1'])
-        return -gp_output.log_prob(self.activations['fc2']).mean()
+        log_prob = gp_output.log_prob(self.activations['fc2'])
+        return -log_prob.mean()
+
 
 # Instantiate the advanced model
 advanced_model = AdvancedFastThinkNet()

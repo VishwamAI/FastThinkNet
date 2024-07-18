@@ -1,13 +1,12 @@
 import argparse
-import json
 import gym
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-import matplotlib.pyplot as plt
 from fastthinknet.utils import logging
 from fastthinknet.models import base_model
 from fastthinknet.config import Config
+
 
 def create_model(input_shape, action_space):
     model = keras.Sequential([
@@ -18,21 +17,25 @@ def create_model(input_shape, action_space):
     model.compile(optimizer=tf.optimizers.Adam(0.001), loss='mse')
     return model
 
+
 def train_model(model, env, episodes, batch_size):
     for episode in range(episodes):
-        state = env.reset()
+        env.reset()
         done = False
         while not done:
-            action = env.action_space.sample()  # Replace with your action selection logic
-            next_state, reward, done, _ = env.step(action)
+            # Replace with action selection logic
+            action = env.action_space.sample()
+            _, reward, done, _ = env.step(action)
             # Implement your training logic here
         if episode % 10 == 0:
             logging.info(f"Episode {episode} completed")
     return model
 
+
 def update_model(model, memory, batch_size):
     # Implement your model update logic here
     pass
+
 
 def test_model(model, env, episodes):
     for episode in range(episodes):
@@ -46,13 +49,27 @@ def test_model(model, env, episodes):
             state = next_state
         logging.info(f"Test Episode {episode} - Total Reward: {total_reward}")
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Neural Learning Agent for FastThinkNet")
+    parser = argparse.ArgumentParser(
+        description="Neural Learning Agent for FastThinkNet"
+    )
     parser.add_argument("--test", action="store_true", help="Run in test mode")
-    parser.add_argument("--model", type=str, default="trained_model.h5", help="Path to the trained model")
-    parser.add_argument("--episodes", type=int, default=100, help="Number of episodes for training/testing")
-    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
-    parser.add_argument("--use_neural_agent", action="store_true", help="Use Neural Learning Agent instead of base model")
+    parser.add_argument(
+        "--model", type=str, default="trained_model.h5",
+        help="Path to the trained model"
+    )
+    parser.add_argument(
+        "--episodes", type=int, default=100,
+        help="Number of episodes for training/testing"
+    )
+    parser.add_argument(
+        "--batch_size", type=int, default=32, help="Batch size for training"
+    )
+    parser.add_argument(
+        "--use_neural_agent", action="store_true",
+        help="Use Neural Learning Agent instead of base model"
+    )
     args = parser.parse_args()
 
     config = Config()
@@ -63,8 +80,16 @@ def main():
             model = tf.keras.models.load_model(args.model)
             test_model(model, env, episodes=args.episodes)
         else:
-            model = create_model(env.observation_space.shape, env.action_space.n)
-            trained_model = train_model(model, env, episodes=args.episodes, batch_size=args.batch_size)
+            model = create_model(
+                env.observation_space.shape,
+                env.action_space.n
+            )
+            trained_model = train_model(
+                model,
+                env,
+                episodes=args.episodes,
+                batch_size=args.batch_size
+            )
             trained_model.save(args.model)
             logging.info(f"Trained model saved to {args.model}")
             test_model(trained_model, env, episodes=10)
@@ -81,6 +106,7 @@ def main():
             model.test(env, episodes=10)
 
     env.close()
+
 
 if __name__ == "__main__":
     main()

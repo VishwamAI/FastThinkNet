@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
+
 
 def plot_learning_curve(episodes, rewards):
     """
@@ -18,6 +18,7 @@ def plot_learning_curve(episodes, rewards):
     plt.grid(True)
     plt.show()
 
+
 def plot_action_distribution(actions):
     """
     Visualize the distribution of actions taken by the agent.
@@ -32,6 +33,7 @@ def plot_action_distribution(actions):
     plt.xlabel('Action')
     plt.ylabel('Count')
     plt.show()
+
 
 def plot_state_heatmap(states):
     """
@@ -60,9 +62,11 @@ def plot_state_heatmap(states):
     plt.ylabel('Y')
     plt.show()
 
+
 def animate_episode(states, actions):
     """
-    Generate an animation of a single episode, showing the agent's movement and decisions.
+    Generate an animation of a single episode, showing the agent's movement
+    and decisions.
 
     Args:
     states (list): List of states visited by the agent in the episode.
@@ -84,10 +88,13 @@ def animate_episode(states, actions):
         ax.set_title(f'Step {i}, Action: {actions[i]}')
         return agent,
 
-    anim = plt.animation.FuncAnimation(fig, animate, init_func=init,
-                                       frames=len(states), interval=500, blit=True)
+    anim = plt.animation.FuncAnimation(
+        fig, animate, init_func=init,
+        frames=len(states), interval=500, blit=True
+    )
     plt.close(fig)
     return anim
+
 
 if __name__ == "__main__":
     # Example usage with dummy data
@@ -98,7 +105,8 @@ if __name__ == "__main__":
     actions = np.random.randint(0, 4, 1000)
     plot_action_distribution(actions)
 
-    states = [(np.random.randint(0, 10), np.random.randint(0, 10)) for _ in range(1000)]
+    states = [(np.random.randint(0, 10), np.random.randint(0, 10))
+              for _ in range(1000)]
     plot_state_heatmap(states)
 
     episode_states = [(i, i) for i in range(10)]

@@ -9,6 +9,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Define the original FastThinkNet architecture
 class FastThinkNet(nn.Module):
     def __init__(self):
@@ -25,9 +26,11 @@ class FastThinkNet(nn.Module):
         x = self.fc2(x)  # Final layer
         return x
 
+
 # Define the advanced neural network architecture
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(self, input_dim=784, hidden_dim=128, output_dim=10, latent_dim=20):
+    def __init__(self, input_dim=784, hidden_dim=128, output_dim=10,
+                 latent_dim=20):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -36,8 +39,12 @@ class AdvancedFastThinkNet(nn.Module):
 
         # BNN component
         self.bnn_layer = PyroModule[nn.Linear](input_dim, hidden_dim)
-        self.bnn_layer.weight = PyroSample(dist.Normal(0., 1.).expand([hidden_dim, input_dim]).to_event(2))
-        self.bnn_layer.bias = PyroSample(dist.Normal(0., 1.).expand([hidden_dim]).to_event(1))
+        self.bnn_layer.weight = PyroSample(
+            dist.Normal(0., 1.).expand([hidden_dim, input_dim]).to_event(2)
+        )
+        self.bnn_layer.bias = PyroSample(
+            dist.Normal(0., 1.).expand([hidden_dim]).to_event(1)
+        )
 
         # GP component approximation
         self.gp_approx = nn.Sequential(
@@ -64,11 +71,13 @@ class AdvancedFastThinkNet(nn.Module):
     def forward(self, x):
         try:
             # Ensure input is correctly shaped
-            if x.dim() == 4:  # Assuming input is (batch_size, channels, height, width)
+            if x.dim() == 4:  # (batch_size, channels, height, width)
                 x = x.view(-1, self.input_dim)
             elif x.dim() == 2:
                 if x.size(1) != self.input_dim:
-                    raise ValueError(f"Expected input dimension {self.input_dim}, but got {x.size(1)}")
+                    raise ValueError(
+                        f"Expected input dim {self.input_dim}, got {x.size(1)}"
+                    )
             else:
                 raise ValueError(f"Unexpected input shape: {x.shape}")
 
@@ -94,6 +103,7 @@ class AdvancedFastThinkNet(nn.Module):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mu + eps * std
+
 
 # Instantiate the models
 fast_think_net = FastThinkNet()
