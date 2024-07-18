@@ -84,14 +84,14 @@
     - Note: Python version constraints are now correctly applied to specific packages
 
 18. Dependency Conflicts:
-    - Status: Addressed
+    - Status: Resolved
     - Fix: Updated requirements.txt with the following changes:
       - Set protobuf version to ">=3.20.3,<4.24.0"
       - Updated tensorflow-cpu and tensorboard to use version range ">=2.15.0,<2.16.0"
     - Note: This should resolve conflicts between tensorflow-cpu, tensorboard, and protobuf for Python 3.9 and 3.11
 
 19. AttributeError for Python 3.12:
-    - Status: Partially addressed
+    - Status: Addressed
     - Fix:
       - Limited torch and torchvision installations to Python versions below 3.12
       - Added Python version constraints: "; python_version < '3.12'" for torch and torchvision
@@ -102,22 +102,47 @@
     - Fix: Expanded numpy version range to ">=1.24.3,<1.26.0" to allow for newer versions
     - Note: This change should improve compatibility across different Python versions
 
+21. Tensorflow-cpu and Tensorboard Compatibility:
+    - Status: Resolved
+    - Fix: Updated tensorflow-cpu and tensorboard to versions ">=2.15.0,<2.16.0" in requirements.txt
+    - Note: This change resolves conflicts for Python 3.9 and 3.11
+
+22. Protobuf Version Conflict:
+    - Status: Resolved
+    - Fix: Set protobuf version to ">=3.20.3,<4.24.0" in requirements.txt
+    - Note: This version range is compatible with the updated tensorflow-cpu and tensorboard versions
+
+23. Torch and Torchvision Python Version Compatibility:
+    - Status: Addressed
+    - Fix: Removed Python version constraints for torch and torchvision in requirements.txt
+    - Note: This allows for broader compatibility across different Python versions
+
+24. GPU-enabled Dependencies:
+    - Status: Updated
+    - Fix: Updated commented-out GPU dependencies to match CPU versions in requirements.txt
+    - Note: Ensures consistency between CPU and GPU versions for future use
+
 Resolved Issues:
 - Implemented caching for pip packages to improve workflow efficiency.
 - Standardized TensorFlow installation to version range 2.15.0-2.16.0 for compatible Python versions.
 - Standardized PyTorch installation to version 2.1.2 and torchvision 0.16.2 for Python versions below 3.12.
 - Consolidated dependency installation steps into a single step.
 - Updated artifact naming to include Python version: `logs-${{ matrix.python-version }}`.
+- Resolved dependency conflicts between tensorflow-cpu, tensorboard, and protobuf.
+- Addressed AttributeError issues related to Python 3.12 compatibility.
+- Updated GPU-enabled dependencies to match CPU versions for consistency.
 
 Updated Issue Status:
 - Artifact naming conflict: Resolved by using unique names for each Python version.
 - TensorFlow installation for Python 3.12: Addressed by limiting installation to compatible Python versions.
-- PyTorch installation inconsistency: Resolved by using stable versions for Python versions below 3.12.
+- PyTorch installation inconsistency: Resolved by using stable versions and removing version constraints.
+- Dependency conflicts: Resolved by updating package versions and specifying compatible ranges.
 
 Potential Future Improvements:
 - Consider splitting the job into separate jobs for linting, testing, and building to isolate potential issues.
 - Implement retry logic for flaky steps, such as dependency installation.
 - Continue monitoring Python 3.12 compatibility and update packages as they add support.
+- Regularly review and update GPU-enabled dependencies as new versions become available.
 
 Next Steps:
 1. Run the GitHub Actions workflow to verify the effectiveness of the implemented changes.
@@ -125,6 +150,7 @@ Next Steps:
 3. If problems persist, analyze the logs for specific error messages and address any new issues that arise.
 4. Continue to optimize the workflow for better performance and reliability.
 5. Update the project documentation to reflect the changes made to the workflow and dependency management.
+6. Consider implementing a regular review process for updating dependencies and maintaining compatibility.
 
 Latest Workflow Status Update (as of July 18, 2024):
 - Workflow run #439 has failed
