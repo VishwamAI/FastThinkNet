@@ -15,7 +15,7 @@ typing_extensions>=3.6.6,<4.6.0; python_version < '3.11'
 typing_extensions>=4.6.0; python_version >= '3.11'
 urllib3>=2.2.2,<3.0.0
 Werkzeug>=3.0.3,<4.0.0
-gymnasium[all]==0.29.3
+gymnasium[all]==0.29.1
 ale-py>=0.8.0
 shimmy[atari]>=0.2.1,<0.3.0
 matplotlib>=3.7.1,<4.0.0
