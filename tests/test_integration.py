@@ -39,20 +39,13 @@ def test_model_initialization(model):
     assert hasattr(model, "fc_decoder")
 
     # Check for vae_loss method
-    assert hasattr(model, "vae_loss"), (
-        "vae_loss method missing from model"
-    )
-    assert callable(getattr(model, "vae_loss")), (
-        "vae_loss method is not callable"
-    )
+    assert hasattr(model, "vae_loss"), "vae_loss method missing from model"
+    assert callable(getattr(model, "vae_loss")), "vae_loss method is not callable"
 
     # Check for gp_loss method
-    assert hasattr(model, "gp_loss"), (
-        "gp_loss method missing from model"
-    )
-    assert callable(getattr(model, "gp_loss")), (
-        "gp_loss method is not callable"
-    )
+    assert hasattr(model, "gp_loss"), "gp_loss method missing from model"
+    assert callable(getattr(model, "gp_loss")), "gp_loss method is not callable"
+
 
 def test_forward_pass_different_sizes(model):
     batch_sizes = [1, 16, 32, 64]
@@ -60,8 +53,7 @@ def test_forward_pass_different_sizes(model):
         input_data = torch.randn(batch_size, 1, 28, 28)  # Match MNIST image shape
         output = model(input_data)
         assert output.shape == (batch_size, 10), (
-            f"Expected output shape ({batch_size}, 10), "
-            f"but got {output.shape}"
+            f"Expected output shape ({batch_size}, 10), " f"but got {output.shape}"
         )
 
 
@@ -118,9 +110,7 @@ def test_integration(model, data_pipeline):
 
         # Check if the output is a valid probability distribution
         assert torch.allclose(
-            outputs.exp().sum(dim=1),
-            torch.tensor(1.0).to(device),
-            atol=1e-6
+            outputs.exp().sum(dim=1), torch.tensor(1.0).to(device), atol=1e-6
         ), "Output is not a valid probability distribution"
 
         # Check if the model can handle different batch sizes
@@ -130,6 +120,7 @@ def test_integration(model, data_pipeline):
             f"Single image output shape is incorrect. "
             f"Expected (1, 10), got {single_output.shape}"
         )
+
 
 def test_error_handling(model):
     with pytest.raises(ValueError):

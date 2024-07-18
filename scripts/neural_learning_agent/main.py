@@ -6,16 +6,18 @@ import gym
 
 
 def create_model(input_shape, action_space):
-    model = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(32, (3, 3), activation="relu",
-                               input_shape=input_shape),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(64, activation="relu"),
-        tf.keras.layers.Dense(action_space, activation="linear"),
-    ])
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-                  loss="mse")
+    model = tf.keras.Sequential(
+        [
+            tf.keras.layers.Conv2D(
+                32, (3, 3), activation="relu", input_shape=input_shape
+            ),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(64, activation="relu"),
+            tf.keras.layers.Dense(action_space, activation="linear"),
+        ]
+    )
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse")
     return model
 
 
@@ -89,6 +91,7 @@ def train_model(
         episode_rewards.append(episode_reward)
 
     return model, episode_rewards
+
 
 def update_model(model, target_model, states, next_states, rewards, actions, gamma):
     reshaped_next_states = next_states.reshape(-1, 64, 64, 3)

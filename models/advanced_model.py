@@ -52,13 +52,7 @@ def error_handling_context(section_name):
 
 
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(
-        self,
-        input_dim=784,
-        hidden_dim=256,
-        output_dim=10,
-        num_layers=4
-    ):
+    def __init__(self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -149,10 +143,7 @@ class AdvancedFastThinkNet(nn.Module):
                 x = x_reconstructed.view(batch_size, channels, height, width)
             else:
                 x = x_reconstructed.view(
-                    -1,
-                    1,
-                    int(self.input_dim ** 0.5),
-                    int(self.input_dim ** 0.5)
+                    -1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5)
                 )
 
             # Store activations for feature importance analysis
@@ -214,9 +205,7 @@ class AdvancedFastThinkNet(nn.Module):
             return F.log_softmax(x, dim=1)
 
         except torch.cuda.OutOfMemoryError as e:
-            logger.critical(
-                f"CUDA out of memory: {str(e)}. Falling back to CPU."
-            )
+            logger.critical(f"CUDA out of memory: {str(e)}. Falling back to CPU.")
             self.to("cpu")
             x = x.to("cpu")
             return self.forward(x)  # Recursive call with CPU tensors
@@ -233,9 +222,7 @@ class AdvancedFastThinkNet(nn.Module):
             difficulty = min(1.0, epoch / max_epochs)
             self.dropout.p = 0.5 * difficulty
             if self.debug_mode:
-                logger.debug(
-                    f"Curriculum learning: Set dropout to {self.dropout.p}"
-                )
+                logger.debug(f"Curriculum learning: Set dropout to {self.dropout.p}")
         except Exception as e:
             logger.error(f"Error in curriculum learning: {str(e)}")
             raise
