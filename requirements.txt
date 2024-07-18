@@ -14,22 +14,22 @@ sympy==1.13.0
 typing_extensions==4.12.2
 urllib3==2.2.2
 Werkzeug==3.0.3
-gym==0.21.0
+gym==0.26.2
 matplotlib==3.5.1
-pytest
-tqdm
+pytest==7.4.4
+tqdm==4.66.1
 shap==0.41.0
 lime==0.2.0.1
 
 # CPU-only dependencies
-tensorflow==2.17.0
-tensorboard>=2.17,<2.18
+tensorflow==2.15.0
+tensorboard==2.15.1
 torch==2.3.1
 torchvision==0.18.1
 
 # GPU-enabled dependencies
 # Uncomment the following lines for GPU support
-# tensorflow-gpu==2.17.0
+# tensorflow-gpu==2.15.0
 # torch==2.3.1+cu118
 # torchvision==0.18.1+cu118
 # cudatoolkit==11.8
