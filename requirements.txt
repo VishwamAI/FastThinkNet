@@ -22,14 +22,14 @@ shap==0.41.0
 lime==0.2.0.1
 
 # CPU-only dependencies
-tensorflow==2.15.0
-tensorboard==2.15.1
+tensorflow==2.16.1
+tensorboard==2.16.1
 torch==2.3.1
 torchvision==0.18.1
 
 # GPU-enabled dependencies
 # Uncomment the following lines for GPU support
-# tensorflow-gpu==2.15.0
+# tensorflow-gpu==2.16.1
 # torch==2.3.1+cu118
 # torchvision==0.18.1+cu118
 # cudatoolkit==11.8
