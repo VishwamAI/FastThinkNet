@@ -181,3 +181,9 @@ Issue: Dependency conflict with ale-py version
 - Next steps:
   - Re-run the GitHub Actions workflow to verify the effectiveness of this change
   - Monitor the workflow for any remaining issues
+
+[2024-07-18]
+Issue: Dependency conflict with ale-py package in requirements.txt
+Resolution: Updated ale-py version from 0.8.1 to 0.9.0
+Details: The GitHub Actions workflow was failing due to a version conflict with the ale-py package. The specified version ale-py~=0.8.1 was not available for installation, particularly for Python 3.12. To resolve this, we updated the requirements.txt file to specify ale-py==0.9.0, which should be compatible with the other dependencies and the specified Python versions (3.9, 3.11, and 3.12).
+Next steps: Re-run the GitHub Actions workflow to verify that the dependency conflict has been resolved.
