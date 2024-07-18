@@ -1,5 +1,5 @@
 # Common dependencies
-numpy>=1.24.3,<1.25.0
+numpy>=1.24.3,<1.26.0
 pillow==10.4.0
 requests>=2.32.3,<3.0.0
 absl-py>=2.1.0,<3.0.0
@@ -8,7 +8,7 @@ Jinja2>=3.1.4,<4.0.0
 Markdown>=3.6,<4.0
 networkx>=2.8.8,<3.0.0
 packaging>=24.1,<25.0
-protobuf>=4.25.3,<5.0.0
+protobuf>=3.20.3,<4.24.0
 six>=1.16.0,<2.0.0
 sympy>=1.13.0,<2.0.0
 typing_extensions>=3.6.6,<4.6.0; python_version < '3.11'
@@ -24,15 +24,15 @@ lime>=0.2.0.1,<0.3.0
 scipy>=1.10.1,<2.0.0
 
 # CPU-only dependencies
-tensorflow-cpu==2.15.0
-tensorboard==2.15.0
-torch>=2.1.2,<2.2.0
-torchvision>=0.16.2,<0.17.0
+tensorflow-cpu>=2.15.0,<2.16.0
+tensorboard>=2.15.0,<2.16.0
+torch>=2.1.2,<2.2.0; python_version < '3.12'
+torchvision>=0.16.2,<0.17.0; python_version < '3.12'
 
 # GPU-enabled dependencies
 # Uncomment the following lines for GPU support
 # tensorflow-gpu>=2.13.0,<2.14.0
-# torch>=2.1.2,<2.2.0+cu118
-# torchvision>=0.16.2,<0.17.0+cu118
+# torch>=2.1.2,<2.2.0+cu118; python_version < '3.12'
+# torchvision>=0.16.2,<0.17.0+cu118; python_version < '3.12'
 # cudatoolkit==11.8
 # cudnn==8.7.0
