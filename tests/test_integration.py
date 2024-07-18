@@ -37,7 +37,9 @@ def test_model_initialization(model):
 
     # Check for vae_loss method
     assert hasattr(model, "vae_loss"), "vae_loss method missing from model"
-    assert callable(getattr(model, "vae_loss")), "vae_loss method is not callable"
+    assert callable(
+        getattr(model, "vae_loss")
+    ), "vae_loss method is not callable"
 
 
 def test_forward_pass_different_sizes(model):
@@ -94,7 +96,8 @@ def test_integration(model, data_pipeline):
 
         # Check if the outputs are of the expected shape
         assert outputs.shape == (32, 10), (
-            f"Output shape is incorrect. Expected (32, 10), " f"got {outputs.shape}"
+            f"Output shape is incorrect. Expected (32, 10), "
+            f"got {outputs.shape}"
         )
 
 

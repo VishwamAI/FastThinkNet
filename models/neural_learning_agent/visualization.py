@@ -89,7 +89,12 @@ def animate_episode(states, actions):
         return (agent,)
 
     anim = plt.animation.FuncAnimation(
-        fig, animate, init_func=init, frames=len(states), interval=500, blit=True
+        fig,
+        animate,
+        init_func=init,
+        frames=len(states),
+        interval=500,
+        blit=True,
     )
     plt.close(fig)
     return anim
@@ -104,7 +109,10 @@ if __name__ == "__main__":
     actions = np.random.randint(0, 4, 1000)
     plot_action_distribution(actions)
 
-    states = [(np.random.randint(0, 10), np.random.randint(0, 10)) for _ in range(1000)]
+    states = [
+        (np.random.randint(0, 10), np.random.randint(0, 10))
+        for _ in range(1000)
+    ]
     plot_state_heatmap(states)
 
     episode_states = [(i, i) for i in range(10)]

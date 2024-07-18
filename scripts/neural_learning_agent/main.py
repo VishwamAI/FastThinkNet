@@ -17,7 +17,9 @@ def create_model(input_shape, action_space):
             tf.keras.layers.Dense(action_space, activation="linear"),
         ]
     )
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse")
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse"
+    )
     return model
 
 
@@ -93,7 +95,9 @@ def train_model(
     return model, episode_rewards
 
 
-def update_model(model, target_model, states, next_states, rewards, actions, gamma):
+def update_model(
+    model, target_model, states, next_states, rewards, actions, gamma
+):
     reshaped_next_states = next_states.reshape(-1, 64, 64, 3)
     reshaped_states = states.reshape(-1, 64, 64, 3)
     next_q_values = target_model.predict(reshaped_next_states)
@@ -144,7 +148,10 @@ def main():
         help="Path to the trained model",
     )
     parser.add_argument(
-        "--episodes", type=int, default=100, help="Number of episodes for testing"
+        "--episodes",
+        type=int,
+        default=100,
+        help="Number of episodes for testing",
     )
     parser.add_argument(
         "--batch_size", type=int, default=32, help="Batch size for training"
