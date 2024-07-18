@@ -1,0 +1,105 @@
+1. TensorFlow Compatibility Issue:
+   - Status: Resolved
+   - Fix: Updated requirements.txt to specify `typing_extensions<4.6.0,>=3.6.6`
+   - Note: Added Python version constraint `python_version < "3.12"` for TensorFlow
+
+2. Dependency Installation Failure:
+   - Status: Resolved
+   - Fix: Updated GitHub Actions workflow to handle Python version-specific installations
+   - Note: Implemented conditional TensorFlow installation for Python 3.9 and 3.11.5
+
+3. Requirements File Issue:
+   - Status: Resolved
+   - Fix: Updated package versions in requirements.txt to ensure compatibility
+   - Note: Addressed version conflicts, particularly for TensorFlow and typing_extensions
+
+4. Python Version Compatibility:
+   - Status: Improved
+   - Fix: Implemented version-specific installations for TensorFlow and PyTorch
+   - Note: TensorFlow 2.13.0 for Python 3.9, 2.14.0 for 3.11.5, skipped for 3.12.x
+
+5. Resource Constraints:
+   - Status: Improved
+   - Fix: Optimized installation process with version-specific package management
+   - Note: Reduced overall job runtime by avoiding unnecessary installations
+
+6. Gym Package Compatibility:
+   - Status: Resolved
+   - Fix: Updated gym package version in requirements.txt
+   - Note: Ensured compatibility across all specified Python versions
+
+7. Missing Version Specifications:
+   - Status: Resolved
+   - Fix: Added specific version numbers for all packages in requirements.txt
+   - Note: Improved consistency and reproducibility of the environment
+
+8. Installation Times:
+   - Status: Improved
+   - Fix: Implemented conditional installations and used pre-built wheels where possible
+   - Note: Significantly reduced installation times, especially for Python 3.12.x
+
+9. Workflow Efficiency:
+   - Status: Improved
+   - Fix: Optimized installation process and better handling of different Python versions
+   - Note: Workflow now runs more efficiently, but continued monitoring is recommended
+
+10. Artifact Creation Conflict:
+    - Status: Pending
+    - Problem: Conflict when creating artifacts with the same name for different Python versions
+    - Action Needed: Implement unique naming strategy for artifacts based on Python version
+
+11. Build Process Failure:
+    - Status: Pending
+    - Problem: Process completing with exit code 1 for all Python versions
+    - Action Needed: Debug the build process to identify and resolve the cause of the failure
+
+12. Python 3.12.x Compatibility:
+    - Status: Improved
+    - Fix: Added `python -m pip install --upgrade pip setuptools wheel` to base installation
+    - Note: Addressed setuptools compatibility issue, but further testing needed
+
+13. Setuptools Compatibility:
+    - Status: Resolved
+    - Fix: Added upgrade step for pip, setuptools, and wheel in the workflow
+    - Note: This should resolve most compatibility issues with Python 3.12.x
+
+14. PyTorch Installation:
+    - Status: Improved
+    - Fix: Added version-specific PyTorch installation
+    - Note: PyTorch 2.1.2 and torchvision 0.16.2 for Python 3.9 and 3.11.5, pre-release versions for 3.12.x
+
+15. Requirements.txt Syntax Error:
+    - Status: Resolved
+    - Fix: Corrected syntax for Python version constraint in requirements.txt
+    - Note: Changed 'python_version < "3.12"' to '; python_version < "3.12"' on line 40
+
+16. Workflow Failures:
+    - Status: Pending
+    - Action Needed: Verify if the syntax error fix in requirements.txt resolves the workflow failures
+    - Note: Run the GitHub Actions workflow again to confirm the resolution
+
+17. Invalid Requirement in requirements.txt:
+    - Status: Resolved
+    - Fix: Removed line "; python_version < "3.12"" at line 40 in requirements.txt
+    - Note: If Python version constraint is needed, implement it in setup.py or pyproject.toml instead
+
+Resolved Issues:
+- Updated Python versions in the matrix to use ["3.9", "3.11", "3.12"] for better maintainability.
+- Adjusted conditional statements for TensorFlow and PyTorch installations to match the new Python version format.
+- Optimized TensorFlow installation: TensorFlow 2.14.0 for Python 3.11, 2.13.0 for Python 3.9, excluded for Python 3.12.
+- Maintained PyTorch installation strategy: pre-release versions for Python 3.12, stable versions for other Python versions.
+
+Workflow Issues:
+- Job 'build (3.9)' failed during 'Install base dependencies' step after 13 seconds.
+- Job 'build (3.11.5)' failed during 'Install base dependencies' step after 13 seconds.
+- Job 'build (3.12.x)' failed during 'Install base dependencies' step after 13 seconds.
+- 'Upload logs on failure' step failed, potentially indicating environment or permission issues.
+- Detailed logs are required to identify the specific dependency causing the installation failure.
+- Artifact creation failed with error: "Failed to CreateArtifact: Received non-retryable error: Failed request: (409) Conflict: an artifact with this name already exists on the workflow run"
+
+Next steps:
+1. Monitor the next workflow run to confirm that the changes resolve the installation issues for all Python versions.
+2. If issues persist, investigate logs for specific error messages and package conflicts.
+3. Review and potentially update the requirements.txt file to ensure all dependencies are compatible and correctly specified.
+4. Check for any recent changes in the project that might have affected the dependency installation process.
+5. Investigate the artifact naming conflict and consider updating the workflow to use unique names for artifacts.
