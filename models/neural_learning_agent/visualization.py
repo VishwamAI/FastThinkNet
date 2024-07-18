@@ -12,9 +12,9 @@ def plot_learning_curve(episodes, rewards):
     """
     plt.figure(figsize=(10, 6))
     plt.plot(episodes, rewards)
-    plt.title('Learning Curve')
-    plt.xlabel('Episode')
-    plt.ylabel('Reward')
+    plt.title("Learning Curve")
+    plt.xlabel("Episode")
+    plt.ylabel("Reward")
     plt.grid(True)
     plt.show()
 
@@ -29,9 +29,9 @@ def plot_action_distribution(actions):
     unique, counts = np.unique(actions, return_counts=True)
     plt.figure(figsize=(8, 6))
     plt.bar(unique, counts)
-    plt.title('Action Distribution')
-    plt.xlabel('Action')
-    plt.ylabel('Count')
+    plt.title("Action Distribution")
+    plt.xlabel("Action")
+    plt.ylabel("Count")
     plt.show()
 
 
@@ -55,11 +55,11 @@ def plot_state_heatmap(states):
         heatmap[state[1], state[0]] = count
 
     plt.figure(figsize=(10, 8))
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest')
-    plt.colorbar(label='Visit Count')
-    plt.title('State Visitation Heatmap')
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    plt.imshow(heatmap, cmap="hot", interpolation="nearest")
+    plt.colorbar(label="Visit Count")
+    plt.title("State Visitation Heatmap")
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.show()
 
 
@@ -75,22 +75,21 @@ def animate_episode(states, actions):
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.set_xlim(0, max(state[0] for state in states) + 1)
     ax.set_ylim(0, max(state[1] for state in states) + 1)
-    ax.set_title('Agent Movement')
+    ax.set_title("Agent Movement")
 
-    agent, = ax.plot([], [], 'ro', markersize=10)
+    (agent,) = ax.plot([], [], "ro", markersize=10)
 
     def init():
         agent.set_data([], [])
-        return agent,
+        return (agent,)
 
     def animate(i):
         agent.set_data(states[i][0], states[i][1])
-        ax.set_title(f'Step {i}, Action: {actions[i]}')
-        return agent,
+        ax.set_title(f"Step {i}, Action: {actions[i]}")
+        return (agent,)
 
     anim = plt.animation.FuncAnimation(
-        fig, animate, init_func=init,
-        frames=len(states), interval=500, blit=True
+        fig, animate, init_func=init, frames=len(states), interval=500, blit=True
     )
     plt.close(fig)
     return anim
@@ -105,8 +104,7 @@ if __name__ == "__main__":
     actions = np.random.randint(0, 4, 1000)
     plot_action_distribution(actions)
 
-    states = [(np.random.randint(0, 10), np.random.randint(0, 10))
-              for _ in range(1000)]
+    states = [(np.random.randint(0, 10), np.random.randint(0, 10)) for _ in range(1000)]
     plot_state_heatmap(states)
 
     episode_states = [(i, i) for i in range(10)]

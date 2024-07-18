@@ -5,7 +5,8 @@ import numpy as np
 
 class CustomEnv(gym.Env):
     """A custom environment for our neural network agent to interact with."""
-    metadata = {'render.modes': ['human']}
+
+    metadata = {"render.modes": ["human"]}
 
     def __init__(self):
         super(CustomEnv, self).__init__()
@@ -30,7 +31,7 @@ class CustomEnv(gym.Env):
         self.state = np.random.randint(0, 255, (64, 64, 3))
         return self.state
 
-    def render(self, mode='human', close=False):
+    def render(self, mode="human", close=False):
         # Render the environment to the screen
         if close:
             return
@@ -39,6 +40,6 @@ class CustomEnv(gym.Env):
 
 # Register the custom environment
 gym.envs.registration.register(
-    id='CustomEnv-v0',
-    entry_point='environments.custom_env:CustomEnv',
+    id="CustomEnv-v0",
+    entry_point="environments.custom_env:CustomEnv",
 )

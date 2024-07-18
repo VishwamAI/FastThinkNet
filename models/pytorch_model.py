@@ -29,8 +29,7 @@ class FastThinkNet(nn.Module):
 
 # Define the advanced neural network architecture
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(self, input_dim=784, hidden_dim=128, output_dim=10,
-                 latent_dim=20):
+    def __init__(self, input_dim=784, hidden_dim=128, output_dim=10, latent_dim=20):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -40,29 +39,29 @@ class AdvancedFastThinkNet(nn.Module):
         # BNN component
         self.bnn_layer = PyroModule[nn.Linear](input_dim, hidden_dim)
         self.bnn_layer.weight = PyroSample(
-            dist.Normal(0., 1.).expand([hidden_dim, input_dim]).to_event(2)
+            dist.Normal(0.0, 1.0).expand([hidden_dim, input_dim]).to_event(2)
         )
         self.bnn_layer.bias = PyroSample(
-            dist.Normal(0., 1.).expand([hidden_dim]).to_event(1)
+            dist.Normal(0.0, 1.0).expand([hidden_dim]).to_event(1)
         )
 
         # GP component approximation
         self.gp_approx = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim)
+            nn.Linear(hidden_dim, hidden_dim),
         )
 
         # VAE components
         self.encoder = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, latent_dim * 2)
+            nn.Linear(hidden_dim, latent_dim * 2),
         )
         self.decoder = nn.Sequential(
             nn.Linear(latent_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim)
+            nn.Linear(hidden_dim, hidden_dim),
         )
 
         # Output layer

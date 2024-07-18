@@ -52,13 +52,7 @@ def error_handling_context(section_name):
 
 
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(
-        self,
-        input_dim=784,
-        hidden_dim=256,
-        output_dim=10,
-        num_layers=4
-    ):
+    def __init__(self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -118,9 +112,7 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Use reconstructed input for further processing
             x = x_reconstructed.view(
-                -1, 1,
-                int(self.input_dim**0.5),
-                int(self.input_dim**0.5)
+                -1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5)
             )
 
             # Store activations for feature importance analysis
@@ -129,10 +121,10 @@ class AdvancedFastThinkNet(nn.Module):
             # Convolutional layers
             with error_handling_context("convolutional layers"):
                 x = F.relu(self.conv1(x))
-                self.activations['conv1'] = x
+                self.activations["conv1"] = x
                 x = F.max_pool2d(x, 2)
                 x = F.relu(self.conv2(x))
-                self.activations['conv2'] = x
+                self.activations["conv2"] = x
                 x = F.max_pool2d(x, 2)
                 if self.debug_mode:
                     logger.debug(f"After conv layers shape: {x.shape}")
@@ -146,7 +138,7 @@ class AdvancedFastThinkNet(nn.Module):
             # LSTM layer
             with error_handling_context("LSTM layer"):
                 x, _ = self.lstm(x)
-                self.activations['lstm'] = x
+                self.activations["lstm"] = x
                 if self.debug_mode:
                     logger.debug(f"After LSTM shape: {x.shape}")
 
@@ -155,7 +147,7 @@ class AdvancedFastThinkNet(nn.Module):
                 x = x.permute(1, 0, 2)  # Change to (seq_len, batch, features)
                 x = self.attention(x)
                 x = x.permute(1, 0, 2)  # Back to (batch, seq_len, features)
-                self.activations['attention'] = x
+                self.activations["attention"] = x
                 if self.debug_mode:
                     logger.debug(f"After attention shape: {x.shape}")
 
@@ -168,21 +160,19 @@ class AdvancedFastThinkNet(nn.Module):
             # Bayesian fully connected layers
             with error_handling_context("fully connected layers"):
                 x = F.relu(self.fc1(x))
-                self.activations['fc1'] = x
+                self.activations["fc1"] = x
                 x = self.dropout(x)
                 x = self.fc2(x)
-                self.activations['fc2'] = x
+                self.activations["fc2"] = x
                 if self.debug_mode:
                     logger.debug(f"Final output shape: {x.shape}")
 
             return F.log_softmax(x, dim=1)
 
         except torch.cuda.OutOfMemoryError as e:
-            logger.critical(
-                f"CUDA out of memory: {str(e)}. Falling back to CPU."
-            )
-            self.to('cpu')
-            x = x.to('cpu')
+            logger.critical(f"CUDA out of memory: {str(e)}. Falling back to CPU.")
+            self.to("cpu")
+            x = x.to("cpu")
             return self.forward(x)  # Recursive call with CPU tensors
         except InputShapeError as e:
             logger.error(f"Invalid input shape: {str(e)}")
@@ -197,14 +187,12 @@ class AdvancedFastThinkNet(nn.Module):
             difficulty = min(1.0, epoch / max_epochs)
             self.dropout.p = 0.5 * difficulty
             if self.debug_mode:
-                logger.debug(
-                    f"Curriculum learning: Set dropout to {self.dropout.p}"
-                )
+                logger.debug(f"Curriculum learning: Set dropout to {self.dropout.p}")
         except Exception as e:
             logger.error(f"Error in curriculum learning: {str(e)}")
             raise
 
-    def analyze_feature_importance(self, X, y, method='shap', num_samples=100):
+    def analyze_feature_importance(self, X, y, method="shap", num_samples=100):
         """
         Analyze feature importance using SHAP or LIME.
 
@@ -218,8 +206,7 @@ class AdvancedFastThinkNet(nn.Module):
         dict: Feature importance scores
         """
         try:
-            if (not isinstance(X, torch.Tensor) or
-                    not isinstance(y, torch.Tensor)):
+            if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
                 raise ValueError(
@@ -227,20 +214,20 @@ class AdvancedFastThinkNet(nn.Module):
                     f"Got X: {X.shape[0]}, y: {y.shape[0]}"
                 )
 
-            if method == 'shap':
+            if method == "shap":
                 explainer = shap.DeepExplainer(self, X[:num_samples])
                 shap_values = explainer.shap_values(X[:num_samples])
-                return {'shap_values': shap_values}
-            elif method == 'lime':
+                return {"shap_values": shap_values}
+            elif method == "lime":
                 explainer = lime.lime_image.LimeImageExplainer()
                 explanation = explainer.explain_instance(
                     X[0].numpy(),
                     self.predict_proba,
                     top_labels=5,
                     hide_color=0,
-                    num_samples=num_samples
+                    num_samples=num_samples,
                 )
-                return {'lime_explanation': explanation}
+                return {"lime_explanation": explanation}
             else:
                 raise ValueError("Method must be either 'shap' or 'lime'")
         except Exception as e:
@@ -270,23 +257,20 @@ class AdvancedFastThinkNet(nn.Module):
         return mu + eps * std
 
     def vae_loss(self):
-        mu = self.fc_mu(self.activations['fc1'])
-        logvar = self.fc_logvar(self.activations['fc1'])
+        mu = self.fc_mu(self.activations["fc1"])
+        logvar = self.fc_logvar(self.activations["fc1"])
         z = self.vae_reparameterize(mu, logvar)
         x_reconstructed = self.vae_decode(z)
         reconstruction_loss = F.mse_loss(
-            x_reconstructed,
-            self.activations['conv1'].view(-1, self.input_dim)
+            x_reconstructed, self.activations["conv1"].view(-1, self.input_dim)
         )
-        kl_divergence = -0.5 * torch.sum(
-            1 + logvar - mu.pow(2) - logvar.exp()
-        )
+        kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + kl_divergence
 
     def gp_loss(self):
         # Assuming self.gp_layer returns MultivariateNormal distribution
-        gp_output = self.gp_layer(self.activations['fc1'])
-        log_prob = gp_output.log_prob(self.activations['fc2'])
+        gp_output = self.gp_layer(self.activations["fc1"])
+        log_prob = gp_output.log_prob(self.activations["fc2"])
         return -log_prob.mean()
 
 

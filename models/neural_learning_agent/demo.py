@@ -52,8 +52,10 @@ def demonstrate_meta_learning(env, model):
     orig_avg_reward, orig_success_rate = calculate_performance_metrics(
         env, model, num_episodes=50
     )
-    print(f"Average Reward: {orig_avg_reward:.2f}, "
-          f"Success Rate: {orig_success_rate:.2%}")
+    print(
+        f"Average Reward: {orig_avg_reward:.2f}, "
+        f"Success Rate: {orig_success_rate:.2%}"
+    )
 
     # Modify environment (e.g., change reward structure)
     env.modify_reward_structure(new_reward_factor=0.5)
@@ -62,8 +64,7 @@ def demonstrate_meta_learning(env, model):
     mod_avg_reward, mod_success_rate = calculate_performance_metrics(
         env, model, num_episodes=50
     )
-    print(f"Avg Reward: {mod_avg_reward:.2f}, "
-          f"Success Rate: {mod_success_rate:.2%}")
+    print(f"Avg Reward: {mod_avg_reward:.2f}, " f"Success Rate: {mod_success_rate:.2%}")
 
     # Allow model to adapt (simplified adaptation process)
     for _ in range(100):
@@ -73,23 +74,22 @@ def demonstrate_meta_learning(env, model):
             action = np.argmax(model.predict(state.reshape(1, -1)))
             next_state, reward, done, _ = env.step(action)
             # Update model (simplified, in practice use proper training loop)
-            model.fit(
-                state.reshape(1, -1),
-                np.array([action]),
-                epochs=1,
-                verbose=0
-            )
+            model.fit(state.reshape(1, -1), np.array([action]), epochs=1, verbose=0)
             state = next_state
 
     print("\nPerformance after adaptation:")
     adapted_avg_reward, adapted_success_rate = calculate_performance_metrics(
         env, model, num_episodes=50
     )
-    print(f"Average Reward: {adapted_avg_reward:.2f}, "
-          f"Success Rate: {adapted_success_rate:.2%}")
+    print(
+        f"Average Reward: {adapted_avg_reward:.2f}, "
+        f"Success Rate: {adapted_success_rate:.2%}"
+    )
 
-    return ([orig_avg_reward, mod_avg_reward, adapted_avg_reward],
-            [orig_success_rate, mod_success_rate, adapted_success_rate])
+    return (
+        [orig_avg_reward, mod_avg_reward, adapted_avg_reward],
+        [orig_success_rate, mod_success_rate, adapted_success_rate],
+    )
 
 
 def demonstrate_self_play(env, model):
@@ -140,25 +140,25 @@ def visualize_results(rewards, success_rates):
 
     plt.subplot(1, 2, 1)
     plt.plot(rewards)
-    plt.title('Rewards over Episodes')
-    plt.xlabel('Episode')
-    plt.ylabel('Reward')
+    plt.title("Rewards over Episodes")
+    plt.xlabel("Episode")
+    plt.ylabel("Reward")
 
     plt.subplot(1, 2, 2)
     plt.plot(success_rates)
-    plt.title('Success Rate over Episodes')
-    plt.xlabel('Episode')
-    plt.ylabel('Success Rate')
+    plt.title("Success Rate over Episodes")
+    plt.xlabel("Episode")
+    plt.ylabel("Success Rate")
 
     plt.tight_layout()
-    plt.savefig('demo_results.png')
+    plt.savefig("demo_results.png")
     plt.show()
 
 
 def main():
     # Set up the environment and load the model
-    env = gym.make('CustomEnv-v0')
-    model = load_model('path/to/trained_model.h5')
+    env = gym.make("CustomEnv-v0")
+    model = load_model("path/to/trained_model.h5")
 
     # Run demonstrations
     print("Running single episode demonstration...")

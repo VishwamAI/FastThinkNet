@@ -6,24 +6,32 @@ import gym
 
 
 def create_model(input_shape, action_space):
-    model = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(32, (3, 3), activation='relu',
-                               input_shape=input_shape),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(64, activation='relu'),
-        tf.keras.layers.Dense(action_space, activation='linear')
-    ])
-    model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-        loss='mse'
+    model = tf.keras.Sequential(
+        [
+            tf.keras.layers.Conv2D(
+                32, (3, 3), activation="relu", input_shape=input_shape
+            ),
+            tf.keras.layers.MaxPooling2D((2, 2)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(64, activation="relu"),
+            tf.keras.layers.Dense(action_space, activation="linear"),
+        ]
     )
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse")
     return model
 
 
-def train_model(model, env, episode_rewards, episodes=2000, gamma=0.99,
-                epsilon_start=1.0, epsilon_end=0.01, epsilon_decay=0.995,
-                batch_size=32):
+def train_model(
+    model,
+    env,
+    episode_rewards,
+    episodes=2000,
+    gamma=0.99,
+    epsilon_start=1.0,
+    epsilon_end=0.01,
+    epsilon_decay=0.995,
+    batch_size=32,
+):
     target_model = tf.keras.models.clone_model(model)
     target_model.set_weights(model.get_weights())
 
@@ -55,17 +63,25 @@ def train_model(model, env, episode_rewards, episodes=2000, gamma=0.99,
 
             if len(states) >= batch_size:
                 update_model(
-                    model, target_model,
-                    np.array(states), np.array(next_states),
-                    np.array(rewards), np.array(actions), gamma
+                    model,
+                    target_model,
+                    np.array(states),
+                    np.array(next_states),
+                    np.array(rewards),
+                    np.array(actions),
+                    gamma,
                 )
                 states, next_states, rewards, actions = [], [], [], []
 
         if states:  # Handle remaining samples
             update_model(
-                model, target_model,
-                np.array(states), np.array(next_states),
-                np.array(rewards), np.array(actions), gamma
+                model,
+                target_model,
+                np.array(states),
+                np.array(next_states),
+                np.array(rewards),
+                np.array(actions),
+                gamma,
             )
 
         if episode % 10 == 0:
@@ -77,8 +93,7 @@ def train_model(model, env, episode_rewards, episodes=2000, gamma=0.99,
     return model, episode_rewards
 
 
-def update_model(model, target_model, states, next_states, rewards,
-                 actions, gamma):
+def update_model(model, target_model, states, next_states, rewards, actions, gamma):
     reshaped_next_states = next_states.reshape(-1, 64, 64, 3)
     reshaped_states = states.reshape(-1, 64, 64, 3)
     next_q_values = target_model.predict(reshaped_next_states)
@@ -107,11 +122,13 @@ def test_model(model, env, episodes=100):
         evaluation_rewards.append(episode_reward)
 
     avg_reward = total_reward / episodes
-    print(f"Evaluation complete. Average reward over {episodes} episodes: "
-          f"{avg_reward}")
+    print(
+        f"Evaluation complete. Average reward over {episodes} episodes: "
+        f"{avg_reward}"
+    )
 
     # Save evaluation results
-    with open('evaluation_rewards.json', 'w') as f:
+    with open("evaluation_rewards.json", "w") as f:
         json.dump(evaluation_rewards, f)
 
     return avg_reward, evaluation_rewards
@@ -121,20 +138,20 @@ def main():
     parser = argparse.ArgumentParser(description="Neural Learning Agent")
     parser.add_argument("--test", action="store_true", help="Run in test mode")
     parser.add_argument(
-        "--model", type=str, default="trained_model.h5",
-        help="Path to the trained model"
+        "--model",
+        type=str,
+        default="trained_model.h5",
+        help="Path to the trained model",
     )
     parser.add_argument(
-        "--episodes", type=int, default=100,
-        help="Number of episodes for testing"
+        "--episodes", type=int, default=100, help="Number of episodes for testing"
     )
     parser.add_argument(
-        "--batch_size", type=int, default=32,
-        help="Batch size for training"
+        "--batch_size", type=int, default=32, help="Batch size for training"
     )
     args = parser.parse_args()
 
-    env = gym.make('CustomEnv-v0')
+    env = gym.make("CustomEnv-v0")
 
     if args.test:
         model = tf.keras.models.load_model(args.model)
@@ -154,16 +171,21 @@ def main():
         epsilon_end = 0.01
         epsilon_decay = 0.995
         model, episode_rewards = train_model(
-            model, env, episode_rewards, episodes=episodes,
-            epsilon_start=epsilon_start, epsilon_end=epsilon_end,
-            epsilon_decay=epsilon_decay, batch_size=args.batch_size
+            model,
+            env,
+            episode_rewards,
+            episodes=episodes,
+            epsilon_start=epsilon_start,
+            epsilon_end=epsilon_end,
+            epsilon_decay=epsilon_decay,
+            batch_size=args.batch_size,
         )
 
         # Save episode rewards and model
-        with open('episode_rewards.json', 'w') as f:
+        with open("episode_rewards.json", "w") as f:
             json.dump(episode_rewards, f)
 
-        model.save('trained_model.h5')
+        model.save("trained_model.h5")
 
         # Evaluate the trained model
         test_model(model, env)
@@ -172,5 +194,5 @@ def main():
     env.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
