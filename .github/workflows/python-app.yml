@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60  # Reduced from 120 to 60 minutes
 
     strategy:
       matrix:
@@ -42,14 +42,14 @@ jobs:
 
     - name: Install TensorFlow (Python 3.9 and 3.11 only)
       if: matrix.python-version != '3.12.x'
-      run: pip install tensorflow
+      run: pip install tensorflow==2.13.0  # Specify version to ensure consistency
 
     - name: Install PyTorch
       run: |
         if [ "${{ matrix.python-version }}" = "3.12.x" ]; then
           pip install --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu
         else
-          pip install torch torchvision
+          pip install torch==2.1.2 torchvision==0.16.2  # Specify versions to ensure consistency
         fi
 
     - name: Log versions
