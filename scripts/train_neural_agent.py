@@ -87,7 +87,10 @@ def main():
             model = tf.keras.models.load_model(args.model)
             test_model(model, env, episodes=args.episodes)
         else:
-            model = create_model(env.observation_space.shape, env.action_space.n)
+            model = create_model(
+                env.observation_space.shape,
+                env.action_space.n
+            )
             trained_model = train_model(
                 model, env, episodes=args.episodes, batch_size=args.batch_size
             )
