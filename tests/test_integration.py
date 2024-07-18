@@ -2,9 +2,10 @@ import os
 import sys
 import pytest
 import torch
-from models.pytorch_model import AdvancedFastThinkNet
+import pyro.nn as pyronn
+import gpytorch
+from models.advanced_model import AdvancedFastThinkNet
 from scripts.tf_data_pipeline import create_data_pipeline
-from pyro.nn import PyroModule
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -24,30 +25,44 @@ def test_model_initialization(model):
     assert model.input_dim == 784
     assert model.output_dim == 10
 
-    # Check for BNN components
-    assert isinstance(model.bnn_layer, PyroModule)
+    # Check for Bayesian fully connected layers
+    assert isinstance(model.fc1, pyronn.PyroModule)
+    assert isinstance(model.fc2, pyronn.PyroModule)
 
     # Check for GP components
-    assert hasattr(model, "gp_approx")
-    assert isinstance(model.gp_approx, torch.nn.Sequential)
+    assert hasattr(model, "gp_layer")
+    assert isinstance(model.gp_layer, gpytorch.models.ApproximateGP)
 
     # Check for VAE components
-    assert hasattr(model, "encoder")
-    assert hasattr(model, "decoder")
+    assert hasattr(model, "fc_mu")
+    assert hasattr(model, "fc_logvar")
+    assert hasattr(model, "fc_decoder")
 
     # Check for vae_loss method
-    assert hasattr(model, "vae_loss"), "vae_loss method missing from model"
+    assert hasattr(model, "vae_loss"), (
+        "vae_loss method missing from model"
+    )
     assert callable(getattr(model, "vae_loss")), (
         "vae_loss method is not callable"
     )
 
+    # Check for gp_loss method
+    assert hasattr(model, "gp_loss"), (
+        "gp_loss method missing from model"
+    )
+    assert callable(getattr(model, "gp_loss")), (
+        "gp_loss method is not callable"
+    )
 
 def test_forward_pass_different_sizes(model):
     batch_sizes = [1, 16, 32, 64]
     for batch_size in batch_sizes:
-        input_data = torch.randn(batch_size, 784)
+        input_data = torch.randn(batch_size, 1, 28, 28)  # Match MNIST image shape
         output = model(input_data)
-        assert output.shape == (batch_size, 10)
+        assert output.shape == (batch_size, 10), (
+            f"Expected output shape ({batch_size}, 10), "
+            f"but got {output.shape}"
+        )
 
 
 def test_basic_training_loop(model, data_pipeline):
@@ -62,7 +77,7 @@ def test_basic_training_loop(model, data_pipeline):
 
     initial_loss = None
     for images, labels in data_pipeline.take(50):
-        images = torch.from_numpy(images.numpy()).float().view(-1, 784)
+        images = torch.from_numpy(images.numpy()).float()  # Keep 4D shape
         labels = torch.from_numpy(labels.numpy()).long()
 
         optimizer.zero_grad()
@@ -95,16 +110,31 @@ def test_integration(model, data_pipeline):
         outputs = model(images)
 
         # Check if the outputs are of the expected shape
-        assert outputs.shape == (32, 10), (
-            f"Output shape is incorrect. Expected (32, 10), "
-            f"got {outputs.shape}"
+        batch_size = images.shape[0]
+        assert outputs.shape == (batch_size, 10), (
+            f"Output shape is incorrect. "
+            f"Expected ({batch_size}, 10), got {outputs.shape}"
         )
 
+        # Check if the output is a valid probability distribution
+        assert torch.allclose(
+            outputs.exp().sum(dim=1),
+            torch.tensor(1.0).to(device),
+            atol=1e-6
+        ), "Output is not a valid probability distribution"
+
+        # Check if the model can handle different batch sizes
+        single_image = images[:1]
+        single_output = model(single_image)
+        assert single_output.shape == (1, 10), (
+            f"Single image output shape is incorrect. "
+            f"Expected (1, 10), got {single_output.shape}"
+        )
 
 def test_error_handling(model):
     with pytest.raises(ValueError):
         # Test with incorrect input shape
-        invalid_input = torch.randn(32, 100)  # Incorrect input size
+        invalid_input = torch.randn(32, 3, 28, 28)  # Incorrect number of channels
         model(invalid_input)
 
 

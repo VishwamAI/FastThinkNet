@@ -35,6 +35,3 @@ torchvision==0.16.2
 # torchvision==0.16.2+cu118
 # cudatoolkit==11.8
 # cudnn==8.7.0
-
-# Python version constraint
-; python_version < "3.12"

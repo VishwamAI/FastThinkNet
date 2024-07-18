@@ -65,12 +65,24 @@ class AdvancedFastThinkNet(nn.Module):
         self.output_dim = output_dim
         self.debug_mode = False
 
+        # Determine input channels and dimensions
+        self.input_channels = 1  # Assuming grayscale images
+        self.input_height = int(input_dim ** 0.5)
+        self.input_width = self.input_height
+
         # Convolutional layers for image processing
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(
+            self.input_channels, 32, kernel_size=3, stride=1, padding=1
+        )
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
 
+        # Calculate the size after convolutions and pooling
+        self.conv_output_size = self._get_conv_output_size()
+
         # Recurrent layer for sequence processing
-        self.lstm = nn.LSTM(64, hidden_dim, num_layers=2, batch_first=True)
+        self.lstm = nn.LSTM(
+            self.conv_output_size, hidden_dim, num_layers=2, batch_first=True
+        )
 
         # Attention mechanism
         self.attention = TransformerEncoder(
@@ -88,12 +100,21 @@ class AdvancedFastThinkNet(nn.Module):
         )
 
         # VAE components
+        self.fc_encoder = nn.Linear(input_dim, hidden_dim)
         self.fc_mu = nn.Linear(hidden_dim, hidden_dim)
         self.fc_logvar = nn.Linear(hidden_dim, hidden_dim)
         self.fc_decoder = nn.Linear(hidden_dim, input_dim)
 
         # Dropout for regularization
         self.dropout = nn.Dropout(0.5)
+
+    def _get_conv_output_size(self):
+        # Helper function to calculate the output size after convolutions and pooling
+        with torch.no_grad():
+            x = torch.zeros(1, self.input_channels, self.input_height, self.input_width)
+            x = F.max_pool2d(F.relu(self.conv1(x)), 2)
+            x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+            return x.view(1, -1).size(1)  # Flatten and return the size
 
     def set_debug_mode(self, mode: bool):
         self.debug_mode = mode
@@ -111,15 +132,28 @@ class AdvancedFastThinkNet(nn.Module):
             if self.debug_mode:
                 logger.debug(f"Input shape: {x.shape}")
 
+            # Reshape input for VAE if it's 4D
+            if x.dim() == 4:
+                batch_size, channels, height, width = x.shape
+                x_flattened = x.view(batch_size, -1)
+            else:
+                x_flattened = x
+
             # VAE encoding
-            mu, logvar = self.vae_encode(x)
+            mu, logvar = self.vae_encode(x_flattened)
             z = self.vae_reparameterize(mu, logvar)
             x_reconstructed = self.vae_decode(z)
 
-            # Use reconstructed input for further processing
-            x = x_reconstructed.view(
-                -1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5)
-            )
+            # Reshape reconstructed input for convolutional layers
+            if x.dim() == 4:
+                x = x_reconstructed.view(batch_size, channels, height, width)
+            else:
+                x = x_reconstructed.view(
+                    -1,
+                    1,
+                    int(self.input_dim ** 0.5),
+                    int(self.input_dim ** 0.5)
+                )
 
             # Store activations for feature importance analysis
             self.activations = {}
@@ -137,7 +171,7 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Reshape for LSTM
             with error_handling_context("reshaping for LSTM"):
-                x = x.view(x.size(0), -1, 64)
+                x = x.view(x.size(0), -1, self.conv_output_size)
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
 
@@ -161,7 +195,11 @@ class AdvancedFastThinkNet(nn.Module):
             x = x[:, -1, :]
 
             # Gaussian Process layer
-            x = self.gp_layer(x)
+            gp_output = self.gp_layer(x)
+            x = gp_output.mean  # Extract the mean from the GP output
+            x = x.detach()  # Detach from the computation graph if necessary
+            if self.debug_mode:
+                logger.debug(f"After GP layer shape: {x.shape}")
 
             # Bayesian fully connected layers
             with error_handling_context("fully connected layers"):
@@ -255,7 +293,9 @@ class AdvancedFastThinkNet(nn.Module):
             raise
 
     def vae_encode(self, x):
-        h = F.relu(self.fc1(x.view(-1, self.input_dim)))
+        if x.dim() > 2:
+            x = x.view(x.size(0), -1)  # Flatten input to 2D
+        h = F.relu(self.fc_encoder(x))
         return self.fc_mu(h), self.fc_logvar(h)
 
     def vae_decode(self, z):

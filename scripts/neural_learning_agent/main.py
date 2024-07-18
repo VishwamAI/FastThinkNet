@@ -6,21 +6,16 @@ import gym
 
 
 def create_model(input_shape, action_space):
-    model = tf.keras.Sequential(
-        [
-            tf.keras.layers.Conv2D(
-                32, (3, 3), activation="relu", input_shape=input_shape
-            ),
-            tf.keras.layers.MaxPooling2D((2, 2)),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(64, activation="relu"),
-            tf.keras.layers.Dense(action_space, activation="linear"),
-        ]
-    )
-    model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-        loss="mse"
-    )
+    model = tf.keras.Sequential([
+        tf.keras.layers.Conv2D(32, (3, 3), activation="relu",
+                               input_shape=input_shape),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dense(action_space, activation="linear"),
+    ])
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                  loss="mse")
     return model
 
 
@@ -95,7 +90,6 @@ def train_model(
 
     return model, episode_rewards
 
-
 def update_model(model, target_model, states, next_states, rewards, actions, gamma):
     reshaped_next_states = next_states.reshape(-1, 64, 64, 3)
     reshaped_states = states.reshape(-1, 64, 64, 3)
@@ -104,12 +98,7 @@ def update_model(model, target_model, states, next_states, rewards, actions, gam
     targets = rewards + gamma * max_next_q
     targets = np.column_stack([targets] * model.output_shape[-1])
     targets[np.arange(len(actions)), actions] = rewards + gamma * max_next_q
-    model.fit(
-        reshaped_states,
-        targets,
-        epochs=1,
-        verbose=0
-    )
+    model.fit(reshaped_states, targets, epochs=1, verbose=0)
 
 
 def test_model(model, env, episodes=100):

@@ -105,7 +105,8 @@ class NeuralNetworkAgent:
             if episode % 100 == 0:
                 avg_reward = np.mean(episode_rewards[-100:])
                 print(
-                    f"Episode: {episode}, Avg Reward: {avg_reward:.2f}, "
+                    f"Episode: {episode}, "
+                    f"Avg Reward: {avg_reward:.2f}, "
                     f"Epsilon: {epsilon:.2f}"
                 )
 
