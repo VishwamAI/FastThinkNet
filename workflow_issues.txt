@@ -169,3 +169,15 @@ Issue: Dependency conflict between ale-py, shimmy[atari], and gymnasium[all]
      - Added shimmy[atari]==0.2.1
      - Kept gymnasium[all]==0.29.1
 - Note: These changes should allow successful installation of all required packages. The workflow needs to be re-run to verify the fix.
+
+Update (2023-07-19):
+Issue: Dependency conflict with ale-py version
+- Affected: All Python builds (3.9, 3.11, 3.12)
+- Status: Resolved
+- Problem: The workflow failed due to unavailability of ale-py~=0.8.1
+- Resolution:
+  1. Updated requirements.txt to resolve the conflict:
+     - Changed ale-py==0.9.0 to ale-py==0.8.1
+- Next steps:
+  - Re-run the GitHub Actions workflow to verify the effectiveness of this change
+  - Monitor the workflow for any remaining issues
