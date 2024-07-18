@@ -187,3 +187,19 @@ Issue: Dependency conflict with ale-py package in requirements.txt
 Resolution: Updated ale-py version from 0.8.1 to 0.9.0
 Details: The GitHub Actions workflow was failing due to a version conflict with the ale-py package. The specified version ale-py~=0.8.1 was not available for installation, particularly for Python 3.12. To resolve this, we updated the requirements.txt file to specify ale-py==0.9.0, which should be compatible with the other dependencies and the specified Python versions (3.9, 3.11, and 3.12).
 Next steps: Re-run the GitHub Actions workflow to verify that the dependency conflict has been resolved.
+
+[2024-07-19]
+Issue: Dependency conflict between tensorflow-cpu and tensorboard
+Status: Resolved
+Description: The workflow was failing due to incompatible version requirements between tensorflow-cpu 2.14.0 and tensorboard.
+Resolution: Updated requirements.txt to adjust tensorboard version constraint.
+Changes made:
+- In requirements.txt, changed tensorboard version from ">=2.15.0,<2.17.0" to "<2.15,>=2.14"
+Next steps:
+- Re-run the GitHub Actions workflow to verify if this change resolves the issue completely
+- Monitor the workflow for any remaining conflicts or issues
+
+Overall Status Update:
+- Multiple dependency conflicts have been addressed, including issues with ale-py, tensorflow-cpu, and tensorboard
+- The workflow issues are being systematically resolved, but further verification is needed
+- Next action: Run the GitHub Actions workflow again to confirm if all recent changes have resolved the existing issues
