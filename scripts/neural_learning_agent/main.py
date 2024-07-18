@@ -17,7 +17,10 @@ def create_model(input_shape, action_space):
             tf.keras.layers.Dense(action_space, activation="linear"),
         ]
     )
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse")
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        loss="mse"
+    )
     return model
 
 
@@ -101,7 +104,12 @@ def update_model(model, target_model, states, next_states, rewards, actions, gam
     targets = rewards + gamma * max_next_q
     targets = np.column_stack([targets] * model.output_shape[-1])
     targets[np.arange(len(actions)), actions] = rewards + gamma * max_next_q
-    model.fit(reshaped_states, targets, epochs=1, verbose=0)
+    model.fit(
+        reshaped_states,
+        targets,
+        epochs=1,
+        verbose=0
+    )
 
 
 def test_model(model, env, episodes=100):

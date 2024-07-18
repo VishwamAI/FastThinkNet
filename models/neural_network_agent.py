@@ -45,7 +45,8 @@ class NeuralNetworkAgent:
         initial_state = np.expand_dims(initial_state, axis=0)
         next_state = np.expand_dims(next_state, axis=0)
         gamma = 0.99  # Consider making this a class attribute or parameter
-        self.update(self.model, initial_state, next_state, [reward], [action], gamma)
+        self.update(self.model, initial_state, next_state, [reward], [action],
+                    gamma)
 
     def train(
         self,
@@ -115,6 +116,9 @@ class NeuralNetworkAgent:
     def update(self, target_model, states, next_states, rewards, actions, gamma):
         q_values = self.model.predict(states)
         next_q_values = target_model.predict(next_states)
+
+        for i in range(len(states)):
+            q_values[i][actions[i]] = rewards[i] + gamma * np.max(next_q_values[i])
 
         for i, action in enumerate(actions):
             q_values[i][action] = rewards[i] + gamma * np.max(next_q_values[i])

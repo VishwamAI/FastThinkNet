@@ -50,6 +50,7 @@ def error_handling_context(section_name):
         logger.error(f"Error in {section_name}: {str(e)}")
         raise
 
+
 class AdvancedFastThinkNet(nn.Module):
     def __init__(
         self,
