@@ -177,7 +177,7 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Reshape for LSTM
             with error_handling_context("reshaping for LSTM"):
-                x = x.view(x.size(0), -1, self.conv_output_size)
+                x = x.view(x.size(0), -1, self.conv_output_size // ((self.input_height // 4) * (self.input_width // 4)))
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
 
@@ -202,7 +202,10 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Gaussian Process layer
             gp_output = self.gp_layer(x)
-            x = gp_output.mean  # Extract the mean from the GP output
+            if isinstance(gp_output, gpytorch.distributions.MultivariateNormal):
+                x = gp_output.mean  # Extract the mean if it's a MultivariateNormal
+            else:
+                x = gp_output  # Handle other possible output types
             x = x.detach()  # Detach from the computation graph if necessary
             if self.debug_mode:
                 logger.debug(f"After GP layer shape: {x.shape}")
