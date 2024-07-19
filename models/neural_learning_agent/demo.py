@@ -65,7 +65,7 @@ def demonstrate_meta_learning(env, model):
         env, model, num_episodes=50
     )
     print(
-        f"Avg Reward: {mod_avg_reward:.2f}, "
+        f"Avg Reward: {mod_avg_reward:.2f}, \n"
         f"Success Rate: {mod_success_rate:.2%}"
     )
 
@@ -74,7 +74,9 @@ def demonstrate_meta_learning(env, model):
         state = env.reset()
         done = False
         while not done:
-            action = np.argmax(model.predict(state.reshape(1, -1)))
+            action = np.argmax(
+                model.predict(state.reshape(1, -1))
+            )
             next_state, reward, done, _ = env.step(action)
             # Update model (simplified, in practice use proper training loop)
             model.fit(

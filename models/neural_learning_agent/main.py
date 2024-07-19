@@ -19,7 +19,8 @@ def create_model(input_shape, action_space):
         ]
     )
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse"
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        loss="mse"
     )
     return model
 
@@ -97,7 +98,13 @@ def train_model(
 
 
 def update_model(
-    model, target_model, states, next_states, rewards, actions, gamma
+    model,
+    target_model,
+    states,
+    next_states,
+    rewards,
+    actions,
+    gamma
 ):
     reshaped_next_states = next_states.reshape(-1, 64, 64, 3)
     reshaped_states = states.reshape(-1, 64, 64, 3)
