@@ -52,13 +52,7 @@ def error_handling_context(section_name):
 
 
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(
-        self,
-        input_dim=784,
-        hidden_dim=256,
-        output_dim=10,
-        num_layers=4
-    ):
+    def __init__(self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -112,9 +106,7 @@ class AdvancedFastThinkNet(nn.Module):
         # Helper function to calculate the output size after convolutions
         # and pooling
         with torch.no_grad():
-            x = torch.zeros(
-                1, self.input_channels, self.input_height, self.input_width
-            )
+            x = torch.zeros(1, self.input_channels, self.input_height, self.input_width)
             x = F.max_pool2d(F.relu(self.conv1(x)), 2)
             x = F.max_pool2d(F.relu(self.conv2(x)), 2)
             return x.view(1, -1).size(1)  # Flatten and return the size
@@ -137,9 +129,7 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Reshape input for VAE if it's 4D
             if x.dim() == 4:
-                batch_size, channels, height, width = (
-                    x.shape
-                )
+                batch_size, channels, height, width = x.shape
                 x_flattened = x.view(batch_size, -1)
             else:
                 x_flattened = x
@@ -154,10 +144,7 @@ class AdvancedFastThinkNet(nn.Module):
                 x = x_reconstructed.view(batch_size, channels, height, width)
             else:
                 x = x_reconstructed.view(
-                    -1,
-                    1,
-                    int(self.input_dim ** 0.5),
-                    int(self.input_dim ** 0.5)
+                    -1, 1, int(self.input_dim ** 0.5), int(self.input_dim ** 0.5)
                 )
 
             # Store activations for feature importance analysis
@@ -237,9 +224,7 @@ class AdvancedFastThinkNet(nn.Module):
             difficulty = min(1.0, epoch / max_epochs)
             self.dropout.p = 0.5 * difficulty
             if self.debug_mode:
-                logger.debug(
-                    f"Curriculum learning: Set dropout to {self.dropout.p}"
-                )
+                logger.debug(f"Curriculum learning: Set dropout to {self.dropout.p}")
         except Exception as e:
             logger.error(f"Error in curriculum learning: {str(e)}")
             raise
@@ -258,8 +243,7 @@ class AdvancedFastThinkNet(nn.Module):
         dict: Feature importance scores
         """
         try:
-            if (not isinstance(X, torch.Tensor) or
-                    not isinstance(y, torch.Tensor)):
+            if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
                 raise ValueError(
@@ -268,12 +252,8 @@ class AdvancedFastThinkNet(nn.Module):
                 )
 
             if method == "shap":
-                explainer = shap.DeepExplainer(
-                    self, X[:num_samples]
-                )
-                shap_values = explainer.shap_values(
-                    X[:num_samples]
-                )
+                explainer = shap.DeepExplainer(self, X[:num_samples])
+                shap_values = explainer.shap_values(X[:num_samples])
                 return {"shap_values": shap_values}
             elif method == "lime":
                 explainer = lime.lime_image.LimeImageExplainer()
@@ -321,12 +301,9 @@ class AdvancedFastThinkNet(nn.Module):
         z = self.vae_reparameterize(mu, logvar)
         x_reconstructed = self.vae_decode(z)
         reconstruction_loss = F.mse_loss(
-            x_reconstructed,
-            self.activations["conv1"].view(-1, self.input_dim)
+            x_reconstructed, self.activations["conv1"].view(-1, self.input_dim)
         )
-        kl_divergence = -0.5 * torch.sum(
-            1 + logvar - mu.pow(2) - logvar.exp()
-        )
+        kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + kl_divergence
 
     def gp_loss(self):
