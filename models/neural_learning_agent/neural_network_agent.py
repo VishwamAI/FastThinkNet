@@ -89,11 +89,12 @@ class NeuralNetworkAgent:
                 state = next_state
 
                 if len(memory) > batch_size:
-                    batch_indices = np.random.choice(
+                    batch = np.random.choice(
                         len(memory), batch_size, replace=False
                     )
-                    batch = [memory[i] for i in batch_indices]
-                    states, actions, rewards, next_states, dones = zip(*batch)
+                    states, actions, rewards, next_states, dones = zip(
+                        *[memory[i] for i in batch]
+                    )
 
                     states = np.concatenate(states)
                     next_states = np.concatenate(next_states)
@@ -111,9 +112,10 @@ class NeuralNetworkAgent:
             epsilon = max(epsilon_end, epsilon * epsilon_decay)
 
             if episode % 100 == 0:
+                avg_reward = np.mean(episode_rewards[-100:])
                 print(
                     f"Episode: {episode}, "
-                    f"Avg Reward: {np.mean(episode_rewards[-100:]):.2f}, "
+                    f"Avg Reward: {avg_reward:.2f}, "
                     f"Epsilon: {epsilon:.2f}"
                 )
 
@@ -135,9 +137,6 @@ class NeuralNetworkAgent:
             q_values[i][actions[i]] = rewards[i] + gamma * np.max(
                 next_q_values[i]
             )
-
-        for i, action in enumerate(actions):
-            q_values[i][action] = rewards[i] + gamma * np.max(next_q_values[i])
 
         self.model.fit(states, q_values, verbose=0)
 

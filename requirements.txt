@@ -1,33 +1,42 @@
-# Core dependencies
-numpy==1.26.4
+# Common dependencies
+numpy>=1.24.3,<2.0.0
 pillow==10.4.0
-requests==2.32.3
+requests>=2.32.3,<3.0.0
+absl-py>=2.1.0,<3.0.0
+filelock>=3.15.4,<4.0.0
+Jinja2>=3.1.4,<4.0.0
+Markdown>=3.6,<4.0
+networkx>=2.8.8,<3.0.0
+packaging>=24.1,<25.0
+protobuf>=3.20.3,<4.24.0
+six>=1.16.0,<2.0.0
+sympy>=1.13.0,<2.0.0
+typing_extensions>=4.6.0
+urllib3>=2.2.2,<3.0.0
+Werkzeug>=3.0.3,<4.0.0
+gymnasium[all]==0.29.1
+ale-py==0.8.1
+shimmy[atari]==0.2.1
+matplotlib>=3.7.1,<4.0.0
+pytest>=7.0.1,<8.0.0
+tqdm>=4.66.1,<5.0.0
+shap>=0.41.0,<0.42.0
+lime>=0.2.0.1,<0.3.0
+scipy>=1.10.1,<2.0.0
+setuptools>=65.5.1
+jax==0.4.20
+jaxlib==0.4.20
 
-# Deep learning frameworks (CPU versions for CI/CD)
-tensorflow-cpu==2.17.0
-torch==2.3.1
-torchvision==0.18.1
+# CPU-only dependencies
+tensorflow-cpu>=2.15.0,<2.16.0
+tensorboard>=2.15.0,<2.16.0
+torch>=2.1.2,<2.2.0
+torchvision>=0.16.2,<0.17.0
 
-# Utilities
-absl-py==2.1.0
-filelock==3.15.4
-Jinja2==3.1.4
-Markdown==3.6
-networkx==2.8.8
-packaging==24.1
-protobuf==4.25.3
-six==1.16.0
-sympy==1.13.0
-typing_extensions==4.12.2
-urllib3==2.2.2
-Werkzeug==3.0.3
-
-# Additional dependencies for neural-learning-agent integration
-gym
-matplotlib
-pytest
-tensorflow
-numpy
-tqdm
-
-# Dependencies for neural-learning-agent are included in the above list
+# GPU-enabled dependencies
+# Uncomment the following lines for GPU support
+# tensorflow-gpu>=2.15.0,<2.16.0
+# torch>=2.1.2,<2.2.0+cu118
+# torchvision>=0.16.2,<0.17.0+cu118
+# cudatoolkit==11.8
+# cudnn==8.7.0

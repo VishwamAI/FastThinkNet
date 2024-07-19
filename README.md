@@ -27,11 +27,44 @@ model.train(data)
 model.evaluate(test_data)
 ```
 
+To train the model using the neural learning agent:
+
+```bash
+python scripts/train_neural_agent.py --use_neural_agent
+```
+
 ## Features
 
 - Integration of PyTorch and TensorFlow
 - Implementation of advanced neural network architectures
 - Support for deep learning, reinforcement learning, meta-learning, and self-play
+
+## Neural Learning Agent Integration
+
+FastThinkNet now incorporates a neural learning agent, enhancing the model's ability to learn and adapt. This integration allows for more sophisticated learning strategies and improved performance across various tasks. To use the neural learning agent, simply add the `--use_neural_agent` argument when running the training script.
+
+## Advanced Statistical Methods
+
+FastThinkNet now includes advanced statistical methods to enhance model performance and capabilities:
+
+- Bayesian Neural Networks (BNN): Improved uncertainty estimation and robustness
+- Gaussian Processes (GP): Enhanced prediction and interpolation capabilities
+- Variational Autoencoders (VAE): Powerful generative modeling and representation learning
+
+## Project Structure
+
+The project structure has been updated to include:
+
+- `scripts/neural_learning_agent/`: Contains the new `train_neural_agent.py` script for training with the neural learning agent
+
+## Dependencies
+
+In addition to the existing dependencies, FastThinkNet now requires:
+
+- tensorflow
+- gym
+- numpy
+- matplotlib
 
 ## Contributing
 
@@ -51,4 +84,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 https://github.com/VishwamAI/FastThinkNet
 
-*Last updated: 2023-06-08*
+*Last updated: 2023-06-09*
