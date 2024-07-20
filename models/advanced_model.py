@@ -390,6 +390,9 @@ class AdvancedFastThinkNet(nn.Module):
             self.gp_layer.set_train_data(inputs=self.activations["fc1"], targets=self.activations["fc2"], strict=False)
             self.gp_initialized = True
         gp_output = self.gp_layer(self.activations["fc1"])
+        # Ensure the output size matches the expected size for log probability calculation
+        if gp_output.mean.size(-1) != self.activations["fc2"].size(-1):
+            raise ValueError(f"Size mismatch in GP output: expected {self.activations['fc2'].size(-1)}, got {gp_output.mean.size(-1)}")
         log_prob = gp_output.log_prob(self.activations["fc2"])
         return -log_prob.mean()
 
