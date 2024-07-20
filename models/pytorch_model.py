@@ -29,7 +29,9 @@ class FastThinkNet(nn.Module):
 
 # Define the advanced neural network architecture
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(self, input_dim=784, hidden_dim=128, output_dim=10, latent_dim=20):
+    def __init__(
+        self, input_dim=784, hidden_dim=128, output_dim=10, latent_dim=20
+    ):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim

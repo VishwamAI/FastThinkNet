@@ -40,20 +40,27 @@ def test_model_initialization(model):
 
     # Check for vae_loss method
     assert hasattr(model, "vae_loss"), "vae_loss method missing from model"
-    assert callable(getattr(model, "vae_loss")), "vae_loss method is not callable"
+    assert callable(
+        getattr(model, "vae_loss")
+    ), "vae_loss method is not callable"
 
     # Check for gp_loss method
     assert hasattr(model, "gp_loss"), "gp_loss method missing from model"
-    assert callable(getattr(model, "gp_loss")), "gp_loss method is not callable"
+    assert callable(
+        getattr(model, "gp_loss")
+    ), "gp_loss method is not callable"
 
 
 def test_forward_pass_different_sizes(model):
     batch_sizes = [1, 16, 32, 64]
     for batch_size in batch_sizes:
-        input_data = torch.randn(batch_size, 1, 28, 28)  # Match MNIST image shape
+        input_data = torch.randn(
+            batch_size, 1, 28, 28
+        )  # Match MNIST image shape
         output = model(input_data)
         assert output.shape == (batch_size, 10), (
-            f"Expected output shape ({batch_size}, 10), " f"but got {output.shape}"
+            f"Expected output shape ({batch_size}, 10), "
+            f"but got {output.shape}"
         )
 
 
@@ -125,7 +132,9 @@ def test_integration(model, data_pipeline):
 def test_error_handling(model):
     with pytest.raises(ValueError):
         # Test with incorrect input shape
-        invalid_input = torch.randn(32, 3, 28, 28)  # Incorrect number of channels
+        invalid_input = torch.randn(
+            32, 3, 28, 28
+        )  # Incorrect number of channels
         model(invalid_input)
 
 
