@@ -191,7 +191,7 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Reshape for LSTM
             with error_handling_context("reshaping for LSTM"):
-                x = x.view(x.size(0), -1, self.conv_output_size // 64)
+                x = x.view(x.size(0), -1, self.conv_output_size // (self.input_height // 4 * self.input_width // 4))
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
 
@@ -225,6 +225,9 @@ class AdvancedFastThinkNet(nn.Module):
                 x = x.evaluate()  # Ensure LazyTensor is evaluated
             if self.debug_mode:
                 logger.debug(f"After GP layer shape: {x.shape}")
+
+            # Flatten the tensor before passing to fully connected layers
+            x = x.view(x.size(0), -1)
 
             # Bayesian fully connected layers
             with error_handling_context("fully connected layers"):
