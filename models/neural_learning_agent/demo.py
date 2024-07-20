@@ -74,9 +74,7 @@ def demonstrate_meta_learning(env, model):
         state = env.reset()
         done = False
         while not done:
-            action = np.argmax(
-                model.predict(state.reshape(1, -1))
-            )
+            action = np.argmax(model.predict(state.reshape(1, -1)))
             next_state, reward, done, _ = env.step(action)
             # Update model (simplified, in practice use proper training loop)
             model.fit(

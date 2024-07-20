@@ -7,10 +7,7 @@ from typing import List, Tuple
 
 class FastThinkNetSelfPlay(nn.Module):
     def __init__(
-        self,
-        input_shape=(64, 64, 3),
-        output_size=5,
-        learning_rate=0.001
+        self, input_shape=(64, 64, 3), output_size=5, learning_rate=0.001
     ):
         super().__init__()
         self.model = nn.Sequential(
@@ -161,14 +158,14 @@ class FastThinkNetSelfPlay(nn.Module):
         # Implement knowledge transfer
         def transfer_knowledge():
             # Transfer learned features from deep learning model
-            self.model[0].weight.data = (
-                deep_learning_model.feature_extractor[0].weight.data.clone()
-            )
+            self.model[0].weight.data = deep_learning_model.feature_extractor[
+                0
+            ].weight.data.clone()
 
             # Transfer policy from RL model
-            self.model[-1].weight.data = (
-                rl_model.policy_net[-1].weight.data.clone()
-            )
+            self.model[-1].weight.data = rl_model.policy_net[
+                -1
+            ].weight.data.clone()
 
         self.transfer_knowledge = transfer_knowledge
 
