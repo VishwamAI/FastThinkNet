@@ -70,8 +70,8 @@ def test_basic_training_loop(model, data_pipeline):
 
     def custom_loss(outputs, labels, model):
         nll_loss = criterion(outputs, labels)
-        vae_loss = model.vae_loss()
-        gp_loss = model.gp_loss()
+        vae_loss = model.vae_loss(outputs)  # Pass outputs to vae_loss
+        gp_loss = model.gp_loss(outputs)    # Pass outputs to gp_loss
         return nll_loss + 0.1 * vae_loss + 0.01 * gp_loss
 
     initial_loss = None
@@ -136,8 +136,8 @@ def test_integration(model, data_pipeline):
 def test_error_handling(model):
     model.eval()  # Set the model to evaluation mode
     with pytest.raises(InputShapeError):
-        # Test with incorrect input shape
-        invalid_input = torch.randn(32, 1, 28, 28)  # Correct number of channels
+        # Test with incorrect input shape (wrong number of channels)
+        invalid_input = torch.randn(32, 3, 28, 28)  # 3 channels instead of 1
         model(invalid_input)
 
 
