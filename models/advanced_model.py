@@ -191,8 +191,10 @@ class AdvancedFastThinkNet(nn.Module):
 
             # Reshape for LSTM
             with error_handling_context("reshaping for LSTM"):
-                x = x.view(x.size(0), -1)
-                x = x.view(x.size(0), -1, self.hidden_dim)
+                batch_size, channels, height, width = x.shape
+                x = x.view(batch_size, -1)
+                lstm_input_size = channels * height * width // self.hidden_dim
+                x = x.view(batch_size, lstm_input_size, self.hidden_dim)
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
 
