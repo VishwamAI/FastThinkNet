@@ -97,10 +97,12 @@ class AdvancedFastThinkNet(nn.Module):
 
         # Gaussian Process layer
         self.likelihood = GaussianLikelihood()
+        train_inputs = torch.randn(100, hidden_dim)  # Replace 100 with the actual size of the training data
         train_targets = torch.randn(100)  # Replace 100 with the actual size of the training data
         self.gp_layer = gpytorch.models.ExactGP(
-            train_targets, self.likelihood, gpytorch.kernels.RBFKernel(ard_num_dims=hidden_dim)
+            train_inputs, train_targets, self.likelihood
         )
+        self.covar_module = gpytorch.kernels.RBFKernel(ard_num_dims=hidden_dim)
 
         # VAE components
         self.fc_encoder = nn.Linear(input_dim, hidden_dim)
