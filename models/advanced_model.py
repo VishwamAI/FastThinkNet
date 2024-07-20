@@ -85,10 +85,11 @@ class AdvancedFastThinkNet(nn.Module):
 
         # Convolutional layers for image processing
         self.conv1 = nn.Conv2d(
-            self.input_channels, 32, kernel_size=3, stride=1, padding=1
+            self.input_channels, 32, kernel_size=3, stride=2, padding=1
         )
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1)
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1)
 
         # Calculate the size after convolutions and pooling
         self.conv_output_size = self._get_conv_output_size()
@@ -136,6 +137,8 @@ class AdvancedFastThinkNet(nn.Module):
             x = F.max_pool2d(F.relu(self.conv1(x)), 2)
             x = F.max_pool2d(F.relu(self.conv2(x)), 2)
             x = F.max_pool2d(F.relu(self.conv3(x)), 2)
+            x = F.max_pool2d(F.relu(self.conv4(x)), 2)
+            x = F.max_pool2d(F.relu(self.conv5(x)), 2)
             return x.view(1, -1).size(1)  # Flatten and return the size
 
     def set_debug_mode(self, mode: bool):
@@ -190,6 +193,12 @@ class AdvancedFastThinkNet(nn.Module):
                 x = F.max_pool2d(x, 2)
                 x = F.relu(self.conv3(x))
                 self.activations["conv3"] = x
+                x = F.max_pool2d(x, 2)
+                x = F.relu(self.conv4(x))
+                self.activations["conv4"] = x
+                x = F.max_pool2d(x, 2)
+                x = F.relu(self.conv5(x))
+                self.activations["conv5"] = x
                 x = F.max_pool2d(x, 2)
                 if self.debug_mode:
                     logger.debug(f"After conv layers shape: {x.shape}")
