@@ -193,9 +193,10 @@ class AdvancedFastThinkNet(nn.Module):
             with error_handling_context("reshaping for LSTM"):
                 batch_size, channels, height, width = x.shape
                 x = x.view(batch_size, -1)
-                if x.size(1) % self.hidden_dim != 0:
+                total_elements = x.size(1)
+                if total_elements % self.hidden_dim != 0:
                     raise LSTMError("The total number of elements is not divisible by hidden_dim")
-                lstm_input_size = x.size(1) // self.hidden_dim
+                lstm_input_size = total_elements // self.hidden_dim
                 x = x.view(batch_size, lstm_input_size, self.hidden_dim)
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
