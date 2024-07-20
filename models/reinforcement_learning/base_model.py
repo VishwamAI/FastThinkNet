@@ -9,9 +9,7 @@ class FastThinkNetRL:
         self.learning_rate = learning_rate
 
         # Policy network
-        self.policy_network = self._build_network(
-            state_dim, action_dim, "policy"
-        )
+        self.policy_network = self._build_network(state_dim, action_dim, "policy")
         self.policy_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         # Value network
@@ -30,16 +28,15 @@ class FastThinkNetRL:
         Returns:
             tf.keras.Sequential: The constructed neural network model.
         """
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(
-                64, activation="relu", input_shape=(input_dim,)
-            ),
-            tf.keras.layers.Dense(64, activation="relu"),
-            tf.keras.layers.Dense(
-                output_dim,
-                activation="softmax" if name == "policy" else None
-            ),
-        ])
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Dense(64, activation="relu", input_shape=(input_dim,)),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(
+                    output_dim, activation="softmax" if name == "policy" else None
+                ),
+            ]
+        )
         return model
 
     def choose_action(self, state):
@@ -56,9 +53,7 @@ class FastThinkNetRL:
             while not done:
                 action = self.choose_action(state)
                 next_state, reward, done, _ = env.step(action)
-                episode_experience.append(
-                    (state, action, reward, next_state, done)
-                )
+                episode_experience.append((state, action, reward, next_state, done))
                 state = next_state
             experiences.extend(episode_experience)
         return experiences
@@ -68,8 +63,7 @@ class FastThinkNetRL:
         with tf.GradientTape() as tape:
             action_probs = self.policy_network(states)
             selected_action_probs = tf.reduce_sum(
-                action_probs * tf.one_hot(actions, self.action_dim),
-                axis=1
+                action_probs * tf.one_hot(actions, self.action_dim), axis=1
             )
             log_probs = tf.math.log(selected_action_probs)
             loss = -tf.reduce_mean(log_probs * advantages)

@@ -52,13 +52,7 @@ def error_handling_context(section_name):
 
 
 class AdvancedFastThinkNet(nn.Module):
-    def __init__(
-        self,
-        input_dim=784,
-        hidden_dim=256,
-        output_dim=10,
-        num_layers=4
-    ):
+    def __init__(self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -67,7 +61,7 @@ class AdvancedFastThinkNet(nn.Module):
 
         # Determine input channels and dimensions
         self.input_channels = 1  # Assuming grayscale images
-        self.input_height = int(input_dim ** 0.5)
+        self.input_height = int(input_dim**0.5)
         self.input_width = self.input_height
 
         # Convolutional layers for image processing
@@ -112,12 +106,7 @@ class AdvancedFastThinkNet(nn.Module):
         # Helper function to calculate the output size after convolutions
         # and pooling
         with torch.no_grad():
-            x = torch.zeros(
-                1,
-                self.input_channels,
-                self.input_height,
-                self.input_width
-            )
+            x = torch.zeros(1, self.input_channels, self.input_height, self.input_width)
             x = F.max_pool2d(F.relu(self.conv1(x)), 2)
             x = F.max_pool2d(F.relu(self.conv2(x)), 2)
             return x.view(1, -1).size(1)  # Flatten and return the size
@@ -157,8 +146,8 @@ class AdvancedFastThinkNet(nn.Module):
                 x = x_reconstructed.view(
                     -1,
                     1,
-                    int(self.input_dim ** 0.5),
-                    int(self.input_dim ** 0.5),
+                    int(self.input_dim**0.5),
+                    int(self.input_dim**0.5),
                 )
 
             # Store activations for feature importance analysis
@@ -229,9 +218,7 @@ class AdvancedFastThinkNet(nn.Module):
             logger.error(f"Invalid input shape: {str(e)}")
             raise
         except Exception as e:
-            logger.error(
-                f"Unexpected error in forward pass: {str(e)}"
-            )
+            logger.error(f"Unexpected error in forward pass: {str(e)}")
             raise
 
     def curriculum_learning(self, epoch, max_epochs):
@@ -241,8 +228,7 @@ class AdvancedFastThinkNet(nn.Module):
             self.dropout.p = 0.5 * difficulty
             if self.debug_mode:
                 logger.debug(
-                    f"Curriculum learning: Set dropout to "
-                    f"{self.dropout.p}"
+                    f"Curriculum learning: Set dropout to " f"{self.dropout.p}"
                 )
         except Exception as e:
             logger.error(f"Error in curriculum learning: {str(e)}")
@@ -262,8 +248,7 @@ class AdvancedFastThinkNet(nn.Module):
         dict: Feature importance scores
         """
         try:
-            if (not isinstance(X, torch.Tensor) or
-                    not isinstance(y, torch.Tensor)):
+            if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
                 raise ValueError(

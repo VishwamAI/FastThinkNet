@@ -2,7 +2,7 @@ import os
 import sys
 
 print("Current working directory:", os.getcwd())
-print("PYTHONPATH:", os.environ.get('PYTHONPATH', ''))
+print("PYTHONPATH:", os.environ.get("PYTHONPATH", ""))
 print("sys.path:", sys.path)
 
 import argparse
@@ -15,7 +15,12 @@ from models.meta_learning.base_model import FastThinkNetMeta as BaseModel
 from models.self_play.base_model import FastThinkNetSelfPlay as SelfPlayBaseModel
 from config import Config
 
-print("Contents of 'models' directory:", os.listdir(os.path.join(os.getcwd(), 'models')))
+# Add this import to ensure the custom environment is registered
+import models.neural_learning_agent.environments.custom_env
+
+print(
+    "Contents of 'models' directory:", os.listdir(os.path.join(os.getcwd(), "models"))
+)
 
 
 def create_model(input_shape, action_space):
@@ -102,9 +107,7 @@ def main():
             model = tf.keras.models.load_model(args.model)
             test_model(model, env, episodes=args.episodes)
         else:
-            model = create_model(
-                env.observation_space.shape, env.action_space.n
-            )
+            model = create_model(env.observation_space.shape, env.action_space.n)
             trained_model = train_model(
                 model, env, episodes=args.episodes, batch_size=args.batch_size
             )
