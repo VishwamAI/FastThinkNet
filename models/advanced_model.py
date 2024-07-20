@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
+from gpytorch.likelihoods import GaussianLikelihood
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -95,8 +96,10 @@ class AdvancedFastThinkNet(nn.Module):
         self.fc2 = pyronn.PyroModule[nn.Linear](hidden_dim, output_dim)
 
         # Gaussian Process layer
+        likelihood = gpytorch.likelihoods.GaussianLikelihood()
+        train_targets = torch.randn(100)  # Replace 100 with the actual size of the training data
         self.gp_layer = gpytorch.models.ExactGP(
-            gpytorch.kernels.RBFKernel(ard_num_dims=hidden_dim)
+            train_targets, likelihood, gpytorch.kernels.RBFKernel(ard_num_dims=hidden_dim)
         )
 
         # VAE components
