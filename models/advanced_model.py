@@ -13,6 +13,18 @@ import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 from gpytorch.likelihoods import GaussianLikelihood
 
+# Define the ExactGP class with the forward method
+class ExactGP(gpytorch.models.ExactGP):
+    def __init__(self, train_inputs, train_targets, likelihood):
+        super(ExactGP, self).__init__(train_inputs, train_targets, likelihood)
+        self.mean_module = gpytorch.means.ConstantMean()
+        self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
+
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -99,10 +111,7 @@ class AdvancedFastThinkNet(nn.Module):
         self.likelihood = GaussianLikelihood()
         train_inputs = torch.randn(100, hidden_dim)  # Replace 100 with the actual size of the training data
         train_targets = torch.randn(100)  # Replace 100 with the actual size of the training data
-        self.gp_layer = gpytorch.models.ExactGP(
-            train_inputs, train_targets, self.likelihood
-        )
-        self.covar_module = gpytorch.kernels.RBFKernel(ard_num_dims=hidden_dim)
+        self.gp_layer = ExactGP(train_inputs, train_targets, self.likelihood)
 
         # VAE components
         self.fc_encoder = nn.Linear(input_dim, hidden_dim)
