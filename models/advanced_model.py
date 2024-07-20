@@ -193,14 +193,7 @@ class AdvancedFastThinkNet(nn.Module):
             with error_handling_context("reshaping for LSTM"):
                 batch_size, channels, height, width = x.shape
                 x = x.view(batch_size, channels * height * width)
-                total_elements = x.size(1)
-                if total_elements % self.hidden_dim != 0:
-                    # Adjust the dimensions to be divisible by hidden_dim
-                    new_size = (total_elements // self.hidden_dim + 1) * self.hidden_dim
-                    padding = new_size - total_elements
-                    x = F.pad(x, (0, padding))
-                    total_elements = x.size(1)
-                lstm_input_size = total_elements // self.hidden_dim
+                lstm_input_size = (channels * height * width) // self.hidden_dim
                 x = x.view(batch_size, lstm_input_size, self.hidden_dim)
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
@@ -237,7 +230,7 @@ class AdvancedFastThinkNet(nn.Module):
                 logger.debug(f"After GP layer shape: {x.shape}")
 
             # Flatten the tensor before passing to fully connected layers
-            x = x.view(x.size(0), -1)
+            x = x.view(x.size(0), self.hidden_dim)
 
             # Bayesian fully connected layers
             with error_handling_context("fully connected layers"):
