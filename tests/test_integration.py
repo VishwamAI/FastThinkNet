@@ -55,8 +55,7 @@ def test_forward_pass_different_sizes(model):
     model.eval()  # Set the model to evaluation mode
     batch_sizes = [1, 16, 32, 64]
     for batch_size in batch_sizes:
-        input_data = torch.randn(batch_size, 1, 28, 28)  # Match MNIST image shape
-        input_data = input_data.view(batch_size, -1)  # Flatten the input data
+        input_data = torch.randn(batch_size, model.input_channels, model.input_height, model.input_width)  # Match model input shape
         output = model(input_data)
         assert output.shape == (batch_size, model.output_dim), (
             f"Expected output shape ({batch_size}, {model.output_dim}), "
@@ -77,7 +76,8 @@ def test_basic_training_loop(model, data_pipeline):
 
     initial_loss = None
     for images, labels in data_pipeline.take(50):
-        images = torch.from_numpy(images.numpy()).float().view(-1, model.input_channels, model.input_height, model.input_width)  # Ensure 4D shape
+        images = torch.from_numpy(images.numpy()).float()
+        images = images.view(images.shape[0], model.input_channels, model.input_height, model.input_width)  # Ensure 4D shape
         labels = torch.from_numpy(labels.numpy()).long()
 
         optimizer.zero_grad()
@@ -99,7 +99,7 @@ def test_integration(model, data_pipeline):
         labels = torch.from_numpy(labels.numpy()).long()
 
         # Ensure images have the correct shape for the model's input
-        images = images.view(-1, model.input_channels, model.input_height, model.input_width)  # Match MNIST image shape
+        images = images.view(images.size(0), model.input_channels, model.input_height, model.input_width)  # Match MNIST image shape
 
         # Move the model to the same device as the data
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
