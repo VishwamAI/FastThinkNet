@@ -1,13 +1,13 @@
 import os
 import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pytest
 import torch
 import pyro.nn as pyronn
 import gpytorch
 from models.advanced_model import AdvancedFastThinkNet
 from scripts.tf_data_pipeline import create_data_pipeline
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 @pytest.fixture
