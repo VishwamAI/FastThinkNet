@@ -96,7 +96,10 @@ class AdvancedFastThinkNet(nn.Module):
 
         # Recurrent layer for sequence processing
         self.lstm = nn.LSTM(
-            self.conv_output_size, hidden_dim, num_layers=2, batch_first=True
+            input_size=256,  # Match the output channels of conv4
+            hidden_size=hidden_dim,
+            num_layers=2,
+            batch_first=True
         )
 
         # Attention mechanism
@@ -202,8 +205,7 @@ class AdvancedFastThinkNet(nn.Module):
             # Reshape for LSTM
             with error_handling_context("reshaping for LSTM"):
                 batch_size, channels, height, width = x.shape
-                x = x.view(batch_size, -1)  # Flatten the tensor
-                x = x.view(batch_size, self.conv_output_size, -1)
+                x = x.view(batch_size, channels * height * width, -1)
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
 

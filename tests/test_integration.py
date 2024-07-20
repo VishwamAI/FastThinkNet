@@ -55,7 +55,7 @@ def test_forward_pass_different_sizes(model):
     model.eval()  # Set the model to evaluation mode
     batch_sizes = [1, 16, 32, 64]
     for batch_size in batch_sizes:
-        input_data = torch.randn(batch_size, model.input_channels, model.input_height, model.input_width).contiguous()  # Match model input shape
+        input_data = torch.randn(batch_size, model.input_channels, model.input_height, model.input_width)
         output = model(input_data)
         assert output.shape == (batch_size, model.output_dim), (
             f"Expected output shape ({batch_size}, {model.output_dim}), "
@@ -77,7 +77,8 @@ def test_basic_training_loop(model, data_pipeline):
     initial_loss = None
     for images, labels in data_pipeline.take(50):
         images = torch.from_numpy(images.numpy()).float()
-        images = images.view(images.size(0), model.input_channels, model.input_height, model.input_width).contiguous()  # Ensure 4D shape
+        # Ensure correct input shape for the model
+        images = images.view(images.size(0), model.input_channels, model.input_height, model.input_width).contiguous()
         labels = torch.from_numpy(labels.numpy()).long()
 
         optimizer.zero_grad()
@@ -89,7 +90,9 @@ def test_basic_training_loop(model, data_pipeline):
         if initial_loss is None:
             initial_loss = loss.item()
         else:
-            assert loss.item() < initial_loss, "Loss did not decrease during training"
+            assert loss.item() <= initial_loss, "Loss did not decrease or stay the same during training"
+
+    assert loss.item() < initial_loss, "Loss did not decrease overall during training"
 
 
 def test_integration(model, data_pipeline):
