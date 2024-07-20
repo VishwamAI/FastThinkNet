@@ -386,6 +386,9 @@ class AdvancedFastThinkNet(nn.Module):
 
     def gp_loss(self):
         # Assuming self.gp_layer returns MultivariateNormal distribution
+        if not hasattr(self, 'gp_initialized') or not self.gp_initialized:
+            self.gp_layer.set_train_data(inputs=self.activations["fc1"], targets=self.activations["fc2"], strict=False)
+            self.gp_initialized = True
         gp_output = self.gp_layer(self.activations["fc1"])
         log_prob = gp_output.log_prob(self.activations["fc2"])
         return -log_prob.mean()
