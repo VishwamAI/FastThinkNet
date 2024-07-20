@@ -97,8 +97,8 @@ def test_integration(model, data_pipeline):
         images = torch.from_numpy(images.numpy()).float()
         labels = torch.from_numpy(labels.numpy()).long()
 
-        # Reshape images to match the model's input shape
-        images = images.view(-1, 784)
+        # Ensure images have the correct shape for the model's input
+        images = images.view(-1, 1, 28, 28)  # Match MNIST image shape
 
         # Move the model to the same device as the data
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
