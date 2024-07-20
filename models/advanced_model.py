@@ -385,16 +385,23 @@ class AdvancedFastThinkNet(nn.Module):
         return reconstruction_loss + kl_divergence
 
     def gp_loss(self):
-        # Assuming self.gp_layer returns MultivariateNormal distribution
-        if not hasattr(self, 'gp_initialized') or not self.gp_initialized:
-            self.gp_layer.set_train_data(inputs=self.activations["fc1"], targets=self.activations["fc2"].mean(dim=1), strict=False)
-            self.gp_initialized = True
+        # Check if shapes are consistent
+        if self.activations["fc1"].shape[0] != self.activations["fc2"].shape[0]:
+            raise ValueError("Inconsistent batch sizes in activations")
+
+        # Store inputs for GP layer if not initialized
+        if not hasattr(self, 'gp_inputs') or self.gp_inputs is None:
+            self.gp_inputs = self.activations["fc1"].detach().clone()
+            self.gp_targets = self.activations["fc2"].mean(dim=1).detach().clone()
+            self.gp_layer.set_train_data(inputs=self.gp_inputs, targets=self.gp_targets, strict=False)
 
         # Debug print statements
         print(f"FC1 shape: {self.activations['fc1'].shape}")
         print(f"FC2 shape: {self.activations['fc2'].shape}")
+        print(f"GP inputs shape: {self.gp_inputs.shape}")
 
-        gp_output = self.gp_layer(self.activations["fc1"])
+        # Use stored inputs for GP layer
+        gp_output = self.gp_layer(self.gp_inputs)
         print(f"GP output shape: {gp_output.mean.shape}")
 
         # Ensure the output size matches the expected size for log probability calculation
