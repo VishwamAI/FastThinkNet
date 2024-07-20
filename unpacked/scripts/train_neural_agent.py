@@ -1,21 +1,11 @@
-import os
-import sys
-
-print("Current working directory:", os.getcwd())
-print("PYTHONPATH:", os.environ.get('PYTHONPATH', ''))
-print("sys.path:", sys.path)
-
 import argparse
 import gym
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-import logging
-from models.meta_learning.base_model import FastThinkNetMeta as BaseModel
-from models.self_play.base_model import FastThinkNetSelfPlay as SelfPlayBaseModel
-from config import Config
-
-print("Contents of 'models' directory:", os.listdir(os.path.join(os.getcwd(), 'models')))
+from FastThinkNet.utils import logging
+from FastThinkNet.models import base_model
+from FastThinkNet.config import Config
 
 
 def create_model(input_shape, action_space):
@@ -87,11 +77,6 @@ def main():
         action="store_true",
         help="Use Neural Learning Agent instead of base model",
     )
-    parser.add_argument(
-        "--use_self_play",
-        action="store_true",
-        help="Use Self-Play base model instead of Meta-Learning base model",
-    )
     args = parser.parse_args()
 
     config = Config()
@@ -113,10 +98,7 @@ def main():
             test_model(trained_model, env, episodes=10)
     else:
         # Use FastThinkNet's base model
-        if args.use_self_play:
-            model = SelfPlayBaseModel(config)
-        else:
-            model = BaseModel(config)
+        model = base_model.BaseModel(config)
         if args.test:
             model.load(args.model)
             model.test(env, episodes=args.episodes)

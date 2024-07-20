@@ -1,0 +1,132 @@
+Metadata-Version: 2.1
+Name: FastThinkNet
+Version: 0.1.0
+Summary: A neural network library for fast thinking agents, integrating PyTorch and TensorFlow.
+Home-page: https://github.com/VishwamAI/FastThinkNet
+Author: VishwamAI
+Author-email: kasinadhsarma@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy<2.0.0,>=1.24.3
+Requires-Dist: pillow==10.4.0
+Requires-Dist: requests<3.0.0,>=2.32.3
+Requires-Dist: absl-py<3.0.0,>=2.1.0
+Requires-Dist: filelock<4.0.0,>=3.15.4
+Requires-Dist: Jinja2<4.0.0,>=3.1.4
+Requires-Dist: Markdown<4.0,>=3.6
+Requires-Dist: networkx<3.0.0,>=2.8.8
+Requires-Dist: packaging<25.0,>=24.1
+Requires-Dist: protobuf<4.24.0,>=3.20.3
+Requires-Dist: six<2.0.0,>=1.16.0
+Requires-Dist: sympy<2.0.0,>=1.13.0
+Requires-Dist: typing_extensions>=4.6.0
+Requires-Dist: urllib3<3.0.0,>=2.2.2
+Requires-Dist: Werkzeug<4.0.0,>=3.0.3
+Requires-Dist: gymnasium[all]==0.29.1
+Requires-Dist: ale-py==0.8.1
+Requires-Dist: shimmy[atari]==0.2.1
+Requires-Dist: matplotlib<4.0.0,>=3.7.1
+Requires-Dist: pytest<8.0.0,>=7.0.1
+Requires-Dist: tqdm<5.0.0,>=4.66.1
+Requires-Dist: shap<0.42.0,>=0.41.0
+Requires-Dist: lime<0.3.0,>=0.2.0.1
+Requires-Dist: scipy<2.0.0,>=1.10.1
+Requires-Dist: setuptools>=65.5.1
+Requires-Dist: jax==0.4.20
+Requires-Dist: jaxlib==0.4.20
+Requires-Dist: tensorflow-cpu<2.16.0,>=2.15.0
+Requires-Dist: tensorboard<2.16.0,>=2.15.0
+Requires-Dist: torch<2.2.0,>=2.1.2
+Requires-Dist: torchvision<0.17.0,>=0.16.2
+
+# FastThinkNet
+
+FastThinkNet is a neural network library designed for the development of fast thinking agents, integrating the power of PyTorch and TensorFlow. It implements concepts from deep learning, reinforcement learning, meta-learning, and self-play, inspired by the work of Ilya Sutskever.
+
+## Installation
+
+To install FastThinkNet, run the following command:
+
+```bash
+pip install FastThinkNet
+```
+
+## Usage
+
+Here's a simple example of how to use FastThinkNet:
+
+```python
+from FastThinkNet.models import AdvancedModel
+
+# Initialize the model
+model = AdvancedModel()
+
+# Train the model on your data
+model.train(data)
+
+# Evaluate the model
+model.evaluate(test_data)
+```
+
+To train the model using the neural learning agent:
+
+```bash
+python scripts/train_neural_agent.py --use_neural_agent
+```
+
+## Features
+
+- Integration of PyTorch and TensorFlow
+- Implementation of advanced neural network architectures
+- Support for deep learning, reinforcement learning, meta-learning, and self-play
+
+## Neural Learning Agent Integration
+
+FastThinkNet now incorporates a neural learning agent, enhancing the model's ability to learn and adapt. This integration allows for more sophisticated learning strategies and improved performance across various tasks. To use the neural learning agent, simply add the `--use_neural_agent` argument when running the training script.
+
+## Advanced Statistical Methods
+
+FastThinkNet now includes advanced statistical methods to enhance model performance and capabilities:
+
+- Bayesian Neural Networks (BNN): Improved uncertainty estimation and robustness
+- Gaussian Processes (GP): Enhanced prediction and interpolation capabilities
+- Variational Autoencoders (VAE): Powerful generative modeling and representation learning
+
+## Project Structure
+
+The project structure has been updated to include:
+
+- `scripts/neural_learning_agent/`: Contains the new `train_neural_agent.py` script for training with the neural learning agent
+
+## Dependencies
+
+In addition to the existing dependencies, FastThinkNet now requires:
+
+- tensorflow
+- gym
+- numpy
+- matplotlib
+
+## Contributing
+
+Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to the project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Supported Python Versions
+
+- 3.9
+- 3.11
+- 3.12
+
+## GitHub Repository
+
+https://github.com/VishwamAI/FastThinkNet
+
+*Last updated: 2023-06-09*
