@@ -52,6 +52,7 @@ def test_model_initialization(model):
 
 
 def test_forward_pass_different_sizes(model):
+    model.eval()  # Set the model to evaluation mode
     batch_sizes = [1, 16, 32, 64]
     for batch_size in batch_sizes:
         input_data = torch.randn(batch_size, 1, 28, 28)  # Match MNIST image shape
@@ -63,6 +64,7 @@ def test_forward_pass_different_sizes(model):
 
 
 def test_basic_training_loop(model, data_pipeline):
+    model.train()  # Ensure the model is in training mode
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     criterion = torch.nn.NLLLoss()
 
@@ -85,8 +87,8 @@ def test_basic_training_loop(model, data_pipeline):
 
         if initial_loss is None:
             initial_loss = loss.item()
-
-    assert loss.item() < initial_loss, "Loss should decrease during training"
+        else:
+            assert loss.item() < initial_loss, "Loss did not decrease during training"
 
 
 def test_integration(model, data_pipeline):
@@ -128,11 +130,10 @@ def test_integration(model, data_pipeline):
 
 
 def test_error_handling(model):
+    model.eval()  # Set the model to evaluation mode
     with pytest.raises(ValueError):
         # Test with incorrect input shape
-        invalid_input = torch.randn(
-            32, 3, 28, 28
-        )  # Incorrect number of channels
+        invalid_input = torch.randn(32, 3, 28, 28)  # Incorrect number of channels
         model(invalid_input)
 
 
