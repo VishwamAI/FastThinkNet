@@ -202,7 +202,7 @@ class AdvancedFastThinkNet(nn.Module):
             # Reshape for LSTM
             with error_handling_context("reshaping for LSTM"):
                 batch_size, channels, height, width = x.shape
-                x = x.view(batch_size, -1)  # Flatten the tensor
+                x = x.view(batch_size, channels * height * width)  # Flatten the tensor
                 total_elements = x.size(1)
                 if total_elements % self.hidden_dim != 0:
                     raise LSTMError(
