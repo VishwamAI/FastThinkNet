@@ -45,7 +45,7 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
         pip install -e .
-        pip install flake8 black mypy pytest-cov build twine
+        pip install flake8 black==24.4.2 mypy pytest-cov build twine
 
     - name: Log versions and environment info
       run: |
