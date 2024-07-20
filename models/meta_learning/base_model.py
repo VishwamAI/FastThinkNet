@@ -50,10 +50,7 @@ class FastThinkNetMeta(nn.Module):
             x_support, y_support = task
             x_query, y_query = task
 
-            task_model = self.inner_loop(
-                (x_support, y_support),
-                num_inner_steps
-            )
+            task_model = self.inner_loop((x_support, y_support), num_inner_steps)
             predictions = task_model(x_query)
             task_loss = nn.functional.mse_loss(predictions, y_query)
             meta_loss += task_loss
