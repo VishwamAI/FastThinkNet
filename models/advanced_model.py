@@ -387,7 +387,7 @@ class AdvancedFastThinkNet(nn.Module):
     def gp_loss(self):
         # Assuming self.gp_layer returns MultivariateNormal distribution
         if not hasattr(self, 'gp_initialized') or not self.gp_initialized:
-            self.gp_layer.set_train_data(inputs=self.activations["fc1"], targets=self.activations["fc2"], strict=False)
+            self.gp_layer.set_train_data(inputs=self.activations["fc1"], targets=self.activations["fc2"].mean(dim=1), strict=False)
             self.gp_initialized = True
 
         # Debug print statements
@@ -399,9 +399,11 @@ class AdvancedFastThinkNet(nn.Module):
 
         # Ensure the output size matches the expected size for log probability calculation
         if gp_output.mean.shape != self.activations["fc2"].shape:
-            # Adjust GP output size if necessary
-            gp_output_resized = gp_output.mean.view(self.activations["fc2"].shape)
+            # Adjust GP output size to match FC2 shape
+            gp_output_resized = gp_output.mean.unsqueeze(1).expand(self.activations["fc2"].shape)
             print(f"Resized GP output shape: {gp_output_resized.shape}")
+
+            # Calculate log probability using Normal distribution
             log_prob = torch.distributions.Normal(gp_output_resized, torch.ones_like(gp_output_resized)).log_prob(self.activations["fc2"])
         else:
             log_prob = gp_output.log_prob(self.activations["fc2"])
