@@ -118,6 +118,9 @@ class AdvancedFastThinkNet(nn.Module):
         train_targets = torch.randn(100)  # Replace 100 with the actual size of the training data
         self.gp_layer = ExactGP(train_inputs, train_targets, self.likelihood)
 
+        # Linear projection layer after GP layer
+        self.gp_projection = nn.Linear(hidden_dim, hidden_dim)
+
         # VAE components
         self.fc_encoder = nn.Linear(input_dim, hidden_dim)
         self.fc_mu = nn.Linear(hidden_dim, hidden_dim)
@@ -240,9 +243,21 @@ class AdvancedFastThinkNet(nn.Module):
             if self.debug_mode:
                 logger.debug(f"After GP layer shape: {x.shape}")
 
+            # Process GP layer output
+            x = x.view(x.size(0), -1)  # Flatten the GP output
+            if x.size(1) != self.hidden_dim:
+                x = F.adaptive_avg_pool1d(x.unsqueeze(1), self.hidden_dim).squeeze(1)  # Adjust dimension if needed
+            x = self.gp_projection(x)  # Project to correct dimension
+
+            if self.debug_mode:
+                logger.debug(f"After GP projection shape: {x.shape}")
+
+            # Ensure correct shape for fully connected layers
+            if x.size(1) != self.hidden_dim:
+                raise ValueError(f"Expected tensor to have {self.hidden_dim} features, but got {x.size(1)}")
+
             # Flatten the tensor before passing to fully connected layers
             with error_handling_context("flattening for fully connected layers"):
-                x = x.view(x.size(0), -1)  # Flatten the tensor to 2D
                 if x.size(1) != self.hidden_dim:
                     raise ValueError(f"Expected flattened tensor to have {self.hidden_dim} features, but got {x.size(1)}")
                 if self.debug_mode:
