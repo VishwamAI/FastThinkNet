@@ -389,19 +389,18 @@ class AdvancedFastThinkNet(nn.Module):
         if self.activations["fc1"].shape[0] != self.activations["fc2"].shape[0]:
             raise ValueError("Inconsistent batch sizes in activations")
 
-        # Store inputs for GP layer if not initialized
-        if not hasattr(self, 'gp_inputs') or self.gp_inputs is None:
-            self.gp_inputs = self.activations["fc1"].detach().clone()
-            self.gp_targets = self.activations["fc2"].mean(dim=1).detach().clone()
-            self.gp_layer.set_train_data(inputs=self.gp_inputs, targets=self.gp_targets, strict=False)
+        # Update GP layer's training data with current activations
+        current_inputs = self.activations["fc1"].detach()
+        current_targets = self.activations["fc2"].mean(dim=1).detach()
+        self.gp_layer.set_train_data(inputs=current_inputs, targets=current_targets, strict=False)
 
         # Debug print statements
         print(f"FC1 shape: {self.activations['fc1'].shape}")
         print(f"FC2 shape: {self.activations['fc2'].shape}")
-        print(f"GP inputs shape: {self.gp_inputs.shape}")
+        print(f"GP inputs shape: {current_inputs.shape}")
 
-        # Use stored inputs for GP layer
-        gp_output = self.gp_layer(self.gp_inputs)
+        # Use current inputs for GP layer
+        gp_output = self.gp_layer(current_inputs)
         print(f"GP output shape: {gp_output.mean.shape}")
 
         # Ensure the output size matches the expected size for log probability calculation
