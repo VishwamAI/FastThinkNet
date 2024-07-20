@@ -53,7 +53,11 @@ def error_handling_context(section_name):
 
 class AdvancedFastThinkNet(nn.Module):
     def __init__(
-        self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4
+        self,
+        input_dim=784,
+        hidden_dim=256,
+        output_dim=10,
+        num_layers=4
     ):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
@@ -105,8 +109,8 @@ class AdvancedFastThinkNet(nn.Module):
         self.dropout = nn.Dropout(0.5)
 
     def _get_conv_output_size(self):
-        # Helper function to calculate the output size after convolutions
-        # and pooling
+        # Helper function to calculate the output size after
+        # convolutions and pooling
         with torch.no_grad():
             x = torch.zeros(
                 1, self.input_channels, self.input_height, self.input_width
@@ -243,18 +247,16 @@ class AdvancedFastThinkNet(nn.Module):
         Analyze feature importance using SHAP or LIME.
 
         Args:
-        X (torch.Tensor): Input data
-        y (torch.Tensor): Target labels
-        method (str): 'shap' or 'lime'
-        num_samples (int): Number of samples to use for analysis
+            X (torch.Tensor): Input data
+            y (torch.Tensor): Target labels
+            method (str): 'shap' or 'lime'
+            num_samples (int): Number of samples to use for analysis
 
         Returns:
-        dict: Feature importance scores
+            dict: Feature importance scores
         """
         try:
-            if not isinstance(X, torch.Tensor) or not isinstance(
-                y, torch.Tensor
-            ):
+            if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
                 raise ValueError(
@@ -312,9 +314,12 @@ class AdvancedFastThinkNet(nn.Module):
         z = self.vae_reparameterize(mu, logvar)
         x_reconstructed = self.vae_decode(z)
         reconstruction_loss = F.mse_loss(
-            x_reconstructed, self.activations["conv1"].view(-1, self.input_dim)
+            x_reconstructed,
+            self.activations["conv1"].view(-1, self.input_dim)
         )
-        kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+        kl_divergence = -0.5 * torch.sum(
+            1 + logvar - mu.pow(2) - logvar.exp()
+        )
         return reconstruction_loss + kl_divergence
 
     def gp_loss(self):
