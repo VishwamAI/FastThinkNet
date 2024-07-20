@@ -42,7 +42,6 @@ class CustomEnv(gym.Env):
 gym.envs.registration.register(
     id="CustomEnv-v0",
     entry_point=(
-        "models.neural_learning_agent.environments.custom_env:"
-        "CustomEnv"
+        "models.neural_learning_agent.environments.custom_env:" "CustomEnv"
     ),
 )
