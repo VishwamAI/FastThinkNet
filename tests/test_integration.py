@@ -133,7 +133,7 @@ def test_error_handling(model):
     model.eval()  # Set the model to evaluation mode
     with pytest.raises(InputShapeError):
         # Test with incorrect input shape
-        invalid_input = torch.randn(32, 3, 28, 28)  # Incorrect number of channels
+        invalid_input = torch.randn(32, 1, 28, 28)  # Correct number of channels
         model(invalid_input)
 
 
