@@ -31,7 +31,7 @@ def test_model_initialization(model):
 
     # Check for GP components
     assert hasattr(model, "gp_layer")
-    assert isinstance(model.gp_layer, gpytorch.models.ApproximateGP)
+    assert isinstance(model.gp_layer, gpytorch.models.ExactGP)
 
     # Check for VAE components
     assert hasattr(model, "fc_mu")
@@ -54,12 +54,10 @@ def test_model_initialization(model):
 def test_forward_pass_different_sizes(model):
     batch_sizes = [1, 16, 32, 64]
     for batch_size in batch_sizes:
-        input_data = torch.randn(
-            batch_size, 1, 28, 28
-        )  # Match MNIST image shape
+        input_data = torch.randn(batch_size, 1, 28, 28)  # Match MNIST image shape
         output = model(input_data)
-        assert output.shape == (batch_size, 10), (
-            f"Expected output shape ({batch_size}, 10), "
+        assert output.shape == (batch_size, model.output_dim), (
+            f"Expected output shape ({batch_size}, {model.output_dim}), "
             f"but got {output.shape}"
         )
 
@@ -110,9 +108,9 @@ def test_integration(model, data_pipeline):
 
         # Check if the outputs are of the expected shape
         batch_size = images.shape[0]
-        assert outputs.shape == (batch_size, 10), (
+        assert outputs.shape == (batch_size, model.output_dim), (
             f"Output shape is incorrect. "
-            f"Expected ({batch_size}, 10), got {outputs.shape}"
+            f"Expected ({batch_size}, {model.output_dim}), got {outputs.shape}"
         )
 
         # Check if the output is a valid probability distribution

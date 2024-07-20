@@ -95,7 +95,7 @@ class AdvancedFastThinkNet(nn.Module):
         self.fc2 = pyronn.PyroModule[nn.Linear](hidden_dim, output_dim)
 
         # Gaussian Process layer
-        self.gp_layer = gpytorch.models.ApproximateGP(
+        self.gp_layer = gpytorch.models.ExactGP(
             gpytorch.kernels.RBFKernel(ard_num_dims=hidden_dim)
         )
 
@@ -206,7 +206,8 @@ class AdvancedFastThinkNet(nn.Module):
                 x = gp_output.mean  # Extract the mean if it's a MultivariateNormal
             else:
                 x = gp_output  # Handle other possible output types
-            x = x.detach()  # Detach from the computation graph if necessary
+            if isinstance(x, gpytorch.lazy.LazyTensor):
+                x = x.evaluate()  # Ensure LazyTensor is evaluated
             if self.debug_mode:
                 logger.debug(f"After GP layer shape: {x.shape}")
 
