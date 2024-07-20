@@ -192,8 +192,13 @@ class AdvancedFastThinkNet(nn.Module):
             # Reshape for LSTM
             with error_handling_context("reshaping for LSTM"):
                 batch_size, channels, height, width = x.shape
-                x = x.view(batch_size, channels * height * width)
-                lstm_input_size = (channels * height * width) // self.hidden_dim
+                x = x.view(batch_size, -1)  # Flatten the tensor
+                total_elements = x.size(1)
+                if total_elements % self.hidden_dim != 0:
+                    raise LSTMError(
+                        f"Total elements ({total_elements}) not divisible by hidden_dim ({self.hidden_dim})"
+                    )
+                lstm_input_size = total_elements // self.hidden_dim
                 x = x.view(batch_size, lstm_input_size, self.hidden_dim)
                 if self.debug_mode:
                     logger.debug(f"Reshaped for LSTM shape: {x.shape}")
@@ -252,6 +257,9 @@ class AdvancedFastThinkNet(nn.Module):
             return self.forward(x)  # Recursive call with CPU tensors
         except InputShapeError as e:
             logger.error(f"Invalid input shape: {str(e)}")
+            raise
+        except LSTMError as e:
+            logger.error(f"LSTM reshaping error: {str(e)}")
             raise
         except Exception as e:
             logger.error(
