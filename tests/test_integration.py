@@ -6,7 +6,7 @@ import pytest
 import torch
 import pyro.nn as pyronn
 import gpytorch
-from models.advanced_model import AdvancedFastThinkNet
+from models.advanced_model import AdvancedFastThinkNet, InputShapeError
 from scripts.tf_data_pipeline import create_data_pipeline
 
 
@@ -76,7 +76,7 @@ def test_basic_training_loop(model, data_pipeline):
 
     initial_loss = None
     for images, labels in data_pipeline.take(50):
-        images = torch.from_numpy(images.numpy()).float()  # Keep 4D shape
+        images = torch.from_numpy(images.numpy()).float().view(-1, 1, 28, 28)  # Ensure 4D shape
         labels = torch.from_numpy(labels.numpy()).long()
 
         optimizer.zero_grad()
@@ -131,7 +131,7 @@ def test_integration(model, data_pipeline):
 
 def test_error_handling(model):
     model.eval()  # Set the model to evaluation mode
-    with pytest.raises(ValueError):
+    with pytest.raises(InputShapeError):
         # Test with incorrect input shape
         invalid_input = torch.randn(32, 3, 28, 28)  # Incorrect number of channels
         model(invalid_input)

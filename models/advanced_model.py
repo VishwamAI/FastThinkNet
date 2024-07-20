@@ -206,6 +206,7 @@ class AdvancedFastThinkNet(nn.Module):
             x = x[:, -1, :]
 
             # Gaussian Process layer
+            self.gp_layer.set_train_data(inputs=x, targets=torch.zeros(x.size(0)), strict=False)
             gp_output = self.gp_layer(x)
             if isinstance(gp_output, gpytorch.distributions.MultivariateNormal):
                 x = gp_output.mean  # Extract the mean if it's a MultivariateNormal
