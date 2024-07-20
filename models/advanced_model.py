@@ -53,11 +53,7 @@ def error_handling_context(section_name):
 
 class AdvancedFastThinkNet(nn.Module):
     def __init__(
-        self,
-        input_dim=784,
-        hidden_dim=256,
-        output_dim=10,
-        num_layers=4
+        self, input_dim=784, hidden_dim=256, output_dim=10, num_layers=4
     ):
         super(AdvancedFastThinkNet, self).__init__()
         self.input_dim = input_dim
@@ -256,7 +252,9 @@ class AdvancedFastThinkNet(nn.Module):
             dict: Feature importance scores
         """
         try:
-            if not isinstance(X, torch.Tensor) or not isinstance(y, torch.Tensor):
+            if not isinstance(X, torch.Tensor) or not isinstance(
+                y, torch.Tensor
+            ):
                 raise ValueError("X and y must be torch.Tensor objects")
             if X.shape[0] != y.shape[0]:
                 raise ValueError(
@@ -314,12 +312,9 @@ class AdvancedFastThinkNet(nn.Module):
         z = self.vae_reparameterize(mu, logvar)
         x_reconstructed = self.vae_decode(z)
         reconstruction_loss = F.mse_loss(
-            x_reconstructed,
-            self.activations["conv1"].view(-1, self.input_dim)
+            x_reconstructed, self.activations["conv1"].view(-1, self.input_dim)
         )
-        kl_divergence = -0.5 * torch.sum(
-            1 + logvar - mu.pow(2) - logvar.exp()
-        )
+        kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + kl_divergence
 
     def gp_loss(self):
