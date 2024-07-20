@@ -374,14 +374,13 @@ class AdvancedFastThinkNet(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
 
-    def vae_loss(self):
-        mu = self.fc_mu(self.activations["fc1"])
-        logvar = self.fc_logvar(self.activations["fc1"])
+    def vae_loss(self, x):
+        if x.dim() > 2:
+            x = x.view(x.size(0), -1)  # Flatten input to 2D
+        mu, logvar = self.vae_encode(x)
         z = self.vae_reparameterize(mu, logvar)
         x_reconstructed = self.vae_decode(z)
-        reconstruction_loss = F.mse_loss(
-            x_reconstructed, self.activations["conv1"].view(-1, self.input_dim)
-        )
+        reconstruction_loss = F.mse_loss(x_reconstructed, x)
         kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + kl_divergence
 

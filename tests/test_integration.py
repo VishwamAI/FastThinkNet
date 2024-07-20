@@ -68,10 +68,10 @@ def test_basic_training_loop(model, data_pipeline):
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     criterion = torch.nn.NLLLoss()
 
-    def custom_loss(outputs, labels, model):
+    def custom_loss(outputs, labels, model, images):
         nll_loss = criterion(outputs, labels)
-        vae_loss = model.vae_loss()  # Call vae_loss without arguments
-        gp_loss = model.gp_loss()    # Call gp_loss without arguments
+        vae_loss = model.vae_loss(images)  # Pass images to vae_loss
+        gp_loss = model.gp_loss()
         return nll_loss + 0.1 * vae_loss + 0.01 * gp_loss
 
     initial_loss = None
@@ -83,7 +83,7 @@ def test_basic_training_loop(model, data_pipeline):
 
         optimizer.zero_grad()
         outputs = model(images)
-        loss = custom_loss(outputs, labels, model)
+        loss = custom_loss(outputs, labels, model, images)
         loss.backward()
         optimizer.step()
 
